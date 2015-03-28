@@ -49,11 +49,12 @@ pnnBox = ->
 		.allowFrom '.panel-heading'
 
 	chart = (selection)->
-		console.log arguments
+		# console.log arguments
 		selection.each (data)->
+			console.log data
 			div = d3.select(this)
 				.attr(
-					'class', (d)-> "panel #{titleClass}"
+					'class', (d)-> "pnn panel #{titleClass} dropzone"
 					'data-box-type': 'pnn')
 
 			div
@@ -66,6 +67,31 @@ pnnBox = ->
 			heading.text title
 
 			body = div.append('div').attr 'class', 'panel-body dropzone'
+			# console.log body.data()
+			evidences = body
+										.selectAll('div')
+										.data data
+										.enter()
+										.append('div')
+										.text (d)-> d
+										.style
+											margin: '5px 0'
+			
+			evidences.append('i')
+									.attr 'class', 'fa fa-trash pull-right'
+									.style
+										'margin-top': '2px'
+									.on 'click', (d, i)->
+										data.splice(i, 1)
+										evidences = body
+											.selectAll('div')
+											.data data
+											.exit().remove()
+										evidences.data data
+											.text (d)-> d
+											.style
+												margin: '5px 0'
+
 
 			headingButtons.label = heading
 				.append 'span'

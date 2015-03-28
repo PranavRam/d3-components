@@ -1,20 +1,19 @@
 pnnBox = require './pnnBox'
 
 hypothesisBox = ->
-	width = 350
+	width = 600
 	height = 400
 	number = 0
 	title = 'Anand Framed Roger Rabbit'
-	evidences = [{
-		name:'Anand',
-		type: 'label-success'
-		}, {
-		name: 'GT',
-		type: 'label-info'
-		},{
-		name: '2011',
-		type: 'label-warning'
-	}]
+
+	hypothesis =
+		positive:
+			data: ["Evidence 1", "Evidence 2"]
+		negative:
+			data: ["Evidence 3", "Evidence 4"]
+		neutral:
+			data: ["Evidence 5", "Evidence 6"]
+
 	headingButtons = 
 		chevron: null
 		label: null
@@ -52,11 +51,11 @@ hypothesisBox = ->
 		.allowFrom '.panel-heading'
 
 	chart = (selection)->
-		# console.log arguments
+		# console.log hypothesis
 		selection.each (data)->
 			div = d3.select(this)
 				.attr(
-					'class', 'panel panel-info draggable'
+					'class', 'panel panel-dark draggable'
 					'data-box-type': 'hypothesis'
 					'data-box-number': number)
 
@@ -71,21 +70,26 @@ hypothesisBox = ->
 
 			body = div.append('div').attr 'class', 'panel-body'
 
-			positiveBox = pnnBox().title('Positive').titleClass('panel-info')
-			negativeBox = pnnBox().title('Negative').titleClass('panel-danger')
-			neutralBox = pnnBox().title('Neutral').titleClass('panel-warning')
+			positiveBox = pnnBox().title('Positive').titleClass('panel-info').width(width/2 - 25)
+			negativeBox = pnnBox().title('Negative').titleClass('panel-danger left-15').width(width/2 - 25)
+			neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').width(width - 35)
 			# negativeBox = hypothesisBox().title('Negative')
 			# neutralBox = hypothesisBox().title('Neutral')
+
+
 			positiveDiv = body
 									.append('div')
+									.data([hypothesis.positive.data])
 									.call positiveBox
 
 			negativeDiv = body
 									.append('div')
+									.data([hypothesis.negative.data])
 									.call negativeBox
 
 			neutralDiv = body
 									.append('div')
+									.data([hypothesis.neutral.data])
 									.call neutralBox
 			# margin = 5
 			# domain = [0, 100]

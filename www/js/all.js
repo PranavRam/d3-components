@@ -393,23 +393,22 @@ var hypothesisBox, pnnBox;
 pnnBox = require('./pnnBox');
 
 hypothesisBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupInteract, title, width;
-  width = 350;
+  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupInteract, title, width;
+  width = 600;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
-  evidences = [
-    {
-      name: 'Anand',
-      type: 'label-success'
-    }, {
-      name: 'GT',
-      type: 'label-info'
-    }, {
-      name: '2011',
-      type: 'label-warning'
+  hypothesis = {
+    positive: {
+      data: ["Evidence 1", "Evidence 2"]
+    },
+    negative: {
+      data: ["Evidence 3", "Evidence 4"]
+    },
+    neutral: {
+      data: ["Evidence 5", "Evidence 6"]
     }
-  ];
+  };
   headingButtons = {
     chevron: null,
     label: null,
@@ -451,7 +450,7 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr('class', 'panel panel-info draggable', {
+      div = d3.select(this).attr('class', 'panel panel-dark draggable', {
         'data-box-type': 'hypothesis',
         'data-box-number': number
       });
@@ -461,12 +460,12 @@ hypothesisBox = function() {
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
-      positiveDiv = body.append('div').call(positiveBox);
-      negativeDiv = body.append('div').call(negativeBox);
-      neutralDiv = body.append('div').call(neutralBox);
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info').width(width / 2 - 25);
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger left-15').width(width / 2 - 25);
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').width(width - 35);
+      positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
+      negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
+      neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
         'margin-top': '2px'
       }).on('click', function(d) {
@@ -524,6 +523,7 @@ hypothesisBox = function() {
     return chart;
   };
   chart.evidences = function(value) {
+    var evidences;
     if (!arguments.length) {
       return evidences;
     }
@@ -608,11 +608,11 @@ pnnBox = function() {
     }).allowFrom('.panel-heading');
   };
   chart = function(selection) {
-    console.log(arguments);
     return selection.each(function(data) {
       var body, div, heading;
+      console.log(data);
       div = d3.select(this).attr('class', function(d) {
-        return "panel " + titleClass;
+        return "pnn panel " + titleClass + " dropzone";
       }, {
         'data-box-type': 'pnn'
       });
@@ -622,6 +622,22 @@ pnnBox = function() {
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body dropzone');
+      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+        return d;
+      }).style({
+        margin: '5px 0'
+      });
+      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
+        'margin-top': '2px'
+      }).on('click', function(d, i) {
+        data.splice(i, 1);
+        evidences = body.selectAll('div').data(data).exit().remove();
+        return evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+      });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
@@ -959,23 +975,22 @@ var hypothesisBox, pnnBox;
 pnnBox = require('./pnnBox');
 
 hypothesisBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupInteract, title, width;
-  width = 350;
+  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupInteract, title, width;
+  width = 600;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
-  evidences = [
-    {
-      name: 'Anand',
-      type: 'label-success'
-    }, {
-      name: 'GT',
-      type: 'label-info'
-    }, {
-      name: '2011',
-      type: 'label-warning'
+  hypothesis = {
+    positive: {
+      data: ["Evidence 1", "Evidence 2"]
+    },
+    negative: {
+      data: ["Evidence 3", "Evidence 4"]
+    },
+    neutral: {
+      data: ["Evidence 5", "Evidence 6"]
     }
-  ];
+  };
   headingButtons = {
     chevron: null,
     label: null,
@@ -1017,7 +1032,7 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr('class', 'panel panel-info draggable', {
+      div = d3.select(this).attr('class', 'panel panel-dark draggable', {
         'data-box-type': 'hypothesis',
         'data-box-number': number
       });
@@ -1027,12 +1042,12 @@ hypothesisBox = function() {
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
-      positiveDiv = body.append('div').call(positiveBox);
-      negativeDiv = body.append('div').call(negativeBox);
-      neutralDiv = body.append('div').call(neutralBox);
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info').width(width / 2 - 25);
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger left-15').width(width / 2 - 25);
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').width(width - 35);
+      positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
+      negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
+      neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
         'margin-top': '2px'
       }).on('click', function(d) {
@@ -1090,6 +1105,7 @@ hypothesisBox = function() {
     return chart;
   };
   chart.evidences = function(value) {
+    var evidences;
     if (!arguments.length) {
       return evidences;
     }
@@ -1376,11 +1392,11 @@ pnnBox = function() {
     }).allowFrom('.panel-heading');
   };
   chart = function(selection) {
-    console.log(arguments);
     return selection.each(function(data) {
       var body, div, heading;
+      console.log(data);
       div = d3.select(this).attr('class', function(d) {
-        return "panel " + titleClass;
+        return "pnn panel " + titleClass + " dropzone";
       }, {
         'data-box-type': 'pnn'
       });
@@ -1390,6 +1406,22 @@ pnnBox = function() {
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body dropzone');
+      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+        return d;
+      }).style({
+        margin: '5px 0'
+      });
+      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
+        'margin-top': '2px'
+      }).on('click', function(d, i) {
+        data.splice(i, 1);
+        evidences = body.selectAll('div').data(data).exit().remove();
+        return evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+      });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
@@ -1582,11 +1614,11 @@ pnnBox = function() {
     }).allowFrom('.panel-heading');
   };
   chart = function(selection) {
-    console.log(arguments);
     return selection.each(function(data) {
       var body, div, heading;
+      console.log(data);
       div = d3.select(this).attr('class', function(d) {
-        return "panel " + titleClass;
+        return "pnn panel " + titleClass + " dropzone";
       }, {
         'data-box-type': 'pnn'
       });
@@ -1596,6 +1628,22 @@ pnnBox = function() {
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body dropzone');
+      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+        return d;
+      }).style({
+        margin: '5px 0'
+      });
+      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
+        'margin-top': '2px'
+      }).on('click', function(d, i) {
+        data.splice(i, 1);
+        evidences = body.selectAll('div').data(data).exit().remove();
+        return evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+      });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
