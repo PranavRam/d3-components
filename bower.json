@@ -1,0 +1,18 @@
+{
+  "name": "mastering-d3",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.5",
+    "components-font-awesome": "~4.3.0",
+    "interact": "~1.2.4"
+  }
+}
