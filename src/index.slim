@@ -3,23 +3,75 @@ html
 	head
 		title D3 Examples
 		link href='/css/all.css' rel='stylesheet' type='text/css'
+		link href='/lib/ui.css' rel='stylesheet' type='text/css'
 		link href='/lib/components-font-awesome/css/font-awesome.css' rel='stylesheet' type='text/css'
 		script src='/lib/rgbcolor.js'
 		script src='/lib/StackBlur.js'
 		script src='/lib/canvg.js'
 		script src='/lib/interact/interact.js'
+		script src='/lib/Animate.js'
+		script src='/lib/Scroller.js'
+		script src='/lib/render.js'
 	body
 		/ button#btn-update Add Data
-		div#chart
-		div#legend
-		div#canvasg-demo
+		/ div#chart
+		/ div#legend
+		/ div#canvasg-demo
 
-		div[style="width: 1000px; height: 500px;"]
-			div#hypothesis
-			div#evidence
-			div[id="yes-drop" class="draggable entity drag-drop" data-type="entity" entity-name="pranav" style="width: 100px;"] #yes-drop
-		/ div.chart-example#chart
-		/ div.chart-example#radial-chart
+		div#container
+			div#content
+				div#hypothesis
+				div#evidence
+				div[id="yes-drop" class="draggable entity drag-drop" data-type="entity" entity-name="pranav" style="width: 100px;"] #entity
+			/ div.chart-example#chart
+			/ div.chart-example#radial-chart
+
+		#settings
+		  div
+		    label for="scrollingX"  ScrollingX:
+		    input#scrollingX checked="" type="checkbox" /
+		  div
+		    label for="scrollingY"  ScrollingY:
+		    input#scrollingY checked="" type="checkbox" /
+		  div
+		    label for="animating"  Animating:
+		    input#animating checked="" type="checkbox" /
+		  div
+		    label for="bouncing"  Bouncing:
+		    input#bouncing checked="" type="checkbox" /
+		  div
+		    label for="locking"  Locking:
+		    input#locking checked="" type="checkbox" /
+		  div
+		    label for="zooming"  Zooming:
+		    input#zooming checked="" type="checkbox" /
+		  div
+		    label for="minZoom"  Min Zoom:
+		    input#minZoom size="5" type="text" value="0.5" /
+		  div
+		    label for="maxZoom"  Max Zoom:
+		    input#maxZoom size="5" type="text" value="3" /
+		  div
+		    label for="zoomLevel"  Zoom Level:
+		    input#zoomLevel size="5" type="text" /
+		  div
+		    button#zoom Zoom to Level
+		    button#zoomIn +
+		    button#zoomOut -
+		  div
+		    label for="scrollLeft"  Scroll Left:
+		    input#scrollLeft size="9" type="text" /
+		  div
+		    label for="scrollTop"  Scroll Top:
+		    input#scrollTop size="9" type="text" /
+		  div
+		    button#scrollTo Scroll to Coords
+		  div
+		    button#scrollByUp &uarr;
+		    button#scrollByDown &darr;
+		    button#scrollByLeft &larr;
+		    button#scrollByRight &rarr;
 
 	script src='/lib/d3/d3.js'
 	script src='/js/all.js'
+	script src='/lib/ui.js'

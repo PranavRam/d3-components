@@ -57,7 +57,7 @@ group = svg.append 'g'
 					.call picker
 
 eBox = evidenceBox()
-hBox = hypothesisBox()
+window.hBox = hypothesisBox()
 
 box1 = d3.select '#evidence'
 					.data [0]
@@ -92,3 +92,21 @@ interact('.draggable.entity')
 	    textEl = event.target.querySelector('p')
 	    # textEl and (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px')
 	    return
+  .on 'dragstart', (event)->
+  	console.log event
+  	event.target.originalPosX ||= event.pageX
+  	event.target.originalPosY ||= event.pageY
+  	# window.prevCoords = {}
+  	# window.prevCoords =
+  	# 	x : event.pageX - event.target.originalPosX
+  	# 	y : event.pageY - event.target.originalPosY
+
+
+window.contentWidth = 2000
+window.contentHeight = 2000
+
+# Initialize layout
+container = document.getElementById('container')
+content = document.getElementById('content')
+content.style.width = contentWidth + 'px'
+content.style.height = contentHeight + 'px'

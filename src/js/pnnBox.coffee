@@ -55,7 +55,8 @@ pnnBox = ->
 			div = d3.select(this)
 				.attr(
 					'class': (d)-> "pnn panel #{titleClass}"
-					'data-box-type': 'pnn')
+					'data-box-type': 'pnn'
+					'data-box-category': title)
 			# console.log div.attr('data-box-type', 'pnn')
 			div
 				.style

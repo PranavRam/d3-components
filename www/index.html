@@ -3,24 +3,72 @@
   <head>
     <title>D3 Examples</title>
     <link href="/css/all.css" rel="stylesheet" type="text/css" />
+    <link href="/lib/ui.css" rel="stylesheet" type="text/css" />
     <link href="/lib/components-font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css" />
     <script src="/lib/rgbcolor.js"></script>
     <script src="/lib/StackBlur.js"></script>
     <script src="/lib/canvg.js"></script>
     <script src="/lib/interact/interact.js"></script>
+    <script src="/lib/Animate.js"></script>
+    <script src="/lib/Scroller.js"></script>
+    <script src="/lib/render.js"></script>
   </head>
   <body>
-    <div id="chart"></div>
-    <div id="legend"></div>
-    <div id="canvasg-demo"></div>
-    <div style="width: 1000px; height: 500px;">
-      <div id="hypothesis"></div>
-      <div id="evidence"></div>
-      <div class="draggable entity drag-drop" data-type="entity" entity-name="pranav" id="yes-drop" style="width: 100px;">
-        #yes-drop
+    <div id="container">
+      <div id="content">
+        <div id="hypothesis"></div>
+        <div id="evidence"></div>
+        <div class="draggable entity drag-drop" data-type="entity" entity-name="pranav" id="yes-drop" style="width: 100px;">
+          #entity
+        </div>
+      </div>
+    </div>
+    <div id="settings">
+      <div>
+        <label for="scrollingX"> ScrollingX:</label><input checked="" id="scrollingX" type="checkbox" />
+      </div>
+      <div>
+        <label for="scrollingY"> ScrollingY:</label><input checked="" id="scrollingY" type="checkbox" />
+      </div>
+      <div>
+        <label for="animating"> Animating:</label><input checked="" id="animating" type="checkbox" />
+      </div>
+      <div>
+        <label for="bouncing"> Bouncing:</label><input checked="" id="bouncing" type="checkbox" />
+      </div>
+      <div>
+        <label for="locking"> Locking:</label><input checked="" id="locking" type="checkbox" />
+      </div>
+      <div>
+        <label for="zooming"> Zooming:</label><input checked="" id="zooming" type="checkbox" />
+      </div>
+      <div>
+        <label for="minZoom"> Min Zoom:</label><input id="minZoom" size="5" type="text" value="0.5" />
+      </div>
+      <div>
+        <label for="maxZoom"> Max Zoom:</label><input id="maxZoom" size="5" type="text" value="3" />
+      </div>
+      <div>
+        <label for="zoomLevel"> Zoom Level:</label><input id="zoomLevel" size="5" type="text" />
+      </div>
+      <div>
+        <button id="zoom">Zoom to Level</button><button id="zoomIn">+</button><button id="zoomOut">-</button>
+      </div>
+      <div>
+        <label for="scrollLeft"> Scroll Left:</label><input id="scrollLeft" size="9" type="text" />
+      </div>
+      <div>
+        <label for="scrollTop"> Scroll Top:</label><input id="scrollTop" size="9" type="text" />
+      </div>
+      <div>
+        <button id="scrollTo">Scroll to Coords</button>
+      </div>
+      <div>
+        <button id="scrollByUp">&uarr;</button><button id="scrollByDown">&darr;</button><button id="scrollByLeft">&larr;</button><button id="scrollByRight">&rarr;</button>
       </div>
     </div>
   </body>
   <script src="/lib/d3/d3.js"></script>
   <script src="/js/all.js"></script>
+  <script src="/lib/ui.js"></script>
 </html>

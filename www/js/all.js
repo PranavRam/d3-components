@@ -282,8 +282,8 @@ evidenceBox = function() {
         var x, y;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
@@ -309,10 +309,14 @@ evidenceBox = function() {
         }
       },
       onmove: function(event) {
-        var target, x, y;
+        var target, translateFactor, x, y;
         target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1.5;
+        }
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
         target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         target.setAttribute('data-x', x);
         return target.setAttribute('data-y', y);
@@ -322,7 +326,12 @@ evidenceBox = function() {
         textEl = event.target.querySelector('p');
         return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
       }
-    }).allowFrom('.panel-heading');
+    }).allowFrom('.panel-heading').on('dragstart', function(event) {
+      var base, base1;
+      console.log(event);
+      (base = event.target).originalPosX || (base.originalPosX = event.pageX);
+      return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
+    });
   };
   chart = function(selection) {
     return selection.each(function(data) {
@@ -459,7 +468,7 @@ hypothesisBox = function() {
   setupDropzone = function() {
     return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
       accept: '[data-box-type="evidence"]',
-      overlap: 0.5,
+      overlap: 0.3,
       ondropactivate: function(event) {
         return event.target.classList.add('drop-active');
       },
@@ -476,15 +485,20 @@ hypothesisBox = function() {
         return event.relatedTarget.classList.remove('can-drop');
       },
       ondrop: function(event) {
-        var x, y;
+        var translateFactor, x, y;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1;
+        }
+        console.log(event.interaction);
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor;
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
-        return console.log(event.target);
+        return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
       },
       ondropdeactivate: function(event) {
         event.target.classList.remove('drop-active');
@@ -506,10 +520,14 @@ hypothesisBox = function() {
         }
       },
       onmove: function(event) {
-        var target, x, y;
+        var target, translateFactor, x, y;
         target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1.5;
+        }
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
         target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         target.setAttribute('data-x', x);
         return target.setAttribute('data-y', y);
@@ -690,7 +708,8 @@ pnnBox = function() {
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
-        'data-box-type': 'pnn'
+        'data-box-type': 'pnn',
+        'data-box-category': title
       });
       div.style({
         'min-width': width + 'px'
@@ -942,8 +961,8 @@ evidenceBox = function() {
         var x, y;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
@@ -969,10 +988,14 @@ evidenceBox = function() {
         }
       },
       onmove: function(event) {
-        var target, x, y;
+        var target, translateFactor, x, y;
         target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1.5;
+        }
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
         target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         target.setAttribute('data-x', x);
         return target.setAttribute('data-y', y);
@@ -982,7 +1005,12 @@ evidenceBox = function() {
         textEl = event.target.querySelector('p');
         return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
       }
-    }).allowFrom('.panel-heading');
+    }).allowFrom('.panel-heading').on('dragstart', function(event) {
+      var base, base1;
+      console.log(event);
+      (base = event.target).originalPosX || (base.originalPosX = event.pageX);
+      return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
+    });
   };
   chart = function(selection) {
     return selection.each(function(data) {
@@ -1117,7 +1145,7 @@ hypothesisBox = function() {
   setupDropzone = function() {
     return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
       accept: '[data-box-type="evidence"]',
-      overlap: 0.5,
+      overlap: 0.3,
       ondropactivate: function(event) {
         return event.target.classList.add('drop-active');
       },
@@ -1134,15 +1162,20 @@ hypothesisBox = function() {
         return event.relatedTarget.classList.remove('can-drop');
       },
       ondrop: function(event) {
-        var x, y;
+        var translateFactor, x, y;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1;
+        }
+        console.log(event.interaction);
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor;
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
-        return console.log(event.target);
+        return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
       },
       ondropdeactivate: function(event) {
         event.target.classList.remove('drop-active');
@@ -1164,10 +1197,14 @@ hypothesisBox = function() {
         }
       },
       onmove: function(event) {
-        var target, x, y;
+        var target, translateFactor, x, y;
         target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        translateFactor = 1;
+        if (scroller && scroller.__zoomLevel < 1) {
+          translateFactor = 1.5;
+        }
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
         target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
         target.setAttribute('data-x', x);
         return target.setAttribute('data-y', y);
@@ -1351,7 +1388,7 @@ labColorPicker = function() {
 module.exports = labColorPicker;
 
 },{}],4:[function(require,module,exports){
-var box1, box2, eBox, evidenceBox, group, hBox, height, hypothesisBox, labColorPicker, margin, offset, picker, sliderControl, svg, width;
+var box1, box2, container, content, eBox, evidenceBox, group, height, hypothesisBox, labColorPicker, margin, offset, picker, sliderControl, svg, width;
 
 sliderControl = require('./sliderControl');
 
@@ -1418,7 +1455,7 @@ group = svg.append('g').attr({
 
 eBox = evidenceBox();
 
-hBox = hypothesisBox();
+window.hBox = hypothesisBox();
 
 box1 = d3.select('#evidence').data([0]).call(eBox);
 
@@ -1448,7 +1485,24 @@ interact('.draggable.entity').draggable({
     var textEl;
     textEl = event.target.querySelector('p');
   }
+}).on('dragstart', function(event) {
+  var base, base1;
+  console.log(event);
+  (base = event.target).originalPosX || (base.originalPosX = event.pageX);
+  return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
 });
+
+window.contentWidth = 2000;
+
+window.contentHeight = 2000;
+
+container = document.getElementById('container');
+
+content = document.getElementById('content');
+
+content.style.width = contentWidth + 'px';
+
+content.style.height = contentHeight + 'px';
 
 },{"./evidenceBox":1,"./hypothesisBox":2,"./labColorPicker":3,"./sliderControl":6}],5:[function(require,module,exports){
 var pnnBox;
@@ -1515,7 +1569,8 @@ pnnBox = function() {
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
-        'data-box-type': 'pnn'
+        'data-box-type': 'pnn',
+        'data-box-category': title
       });
       div.style({
         'min-width': width + 'px'
@@ -1737,7 +1792,8 @@ pnnBox = function() {
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
-        'data-box-type': 'pnn'
+        'data-box-type': 'pnn',
+        'data-box-category': title
       });
       div.style({
         'min-width': width + 'px'

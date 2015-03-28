@@ -46,9 +46,11 @@ evidenceBox = ->
 		  	event.relatedTarget.classList.add 'Dropped'
 
 		  	# x = event.dragEvent.dx * -1
-		  	x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
+		  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX
+		  	# x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
 		  	# # y = event.dragEvent.dy * -1
-		  	y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
+		  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY
+		  	# y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
 		  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 		  	# # update the posiion attributes
 		  	event.relatedTarget.setAttribute 'data-x', x
@@ -74,8 +76,11 @@ evidenceBox = ->
 		      right: 1
 		  onmove: (event) ->
 		    target = event.target
-		    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx
-		    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy
+		    translateFactor = 1
+		    if scroller and scroller.__zoomLevel < 1
+		    	translateFactor = 1.5
+		    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx * translateFactor
+		    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy * translateFactor
 		    # translate the element
 		    target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 		    # update the posiion attributes
@@ -85,6 +90,10 @@ evidenceBox = ->
 		    textEl = event.target.querySelector('p')
 		    textEl and (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px')
 		.allowFrom '.panel-heading'
+		.on 'dragstart', (event)->
+			console.log event
+			event.target.originalPosX ||= event.pageX
+			event.target.originalPosY ||= event.pageY
 
 	chart = (selection)->
 		selection.each (data)->

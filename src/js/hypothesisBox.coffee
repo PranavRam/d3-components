@@ -27,7 +27,7 @@ hypothesisBox = ->
 	setupDropzone =  ->
 		interact("[data-box-type='hypothesis'][data-box-number='#{number}'] [data-box-type='pnn']").dropzone
 		  accept: '[data-box-type="evidence"]'
-		  overlap: 0.5
+		  overlap: 0.3
 		  ondropactivate: (event) ->
 		    # add active dropzone feedback
 		    event.target.classList.add 'drop-active'
@@ -48,16 +48,21 @@ hypothesisBox = ->
 		  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
 		  	event.relatedTarget.classList.add 'Dropped'
 
+		  	translateFactor = 1
+		  	if scroller and scroller.__zoomLevel < 1
+		  		translateFactor = 1
 		  	# x = event.dragEvent.dx * -1
-		  	x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
+		  	console.log event.interaction
+		  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor
 		  	# # y = event.dragEvent.dy * -1
-		  	y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
+		  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor
 		  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 		  	# # update the posiion attributes
 		  	event.relatedTarget.setAttribute 'data-x', x
 		  	event.relatedTarget.setAttribute 'data-y', y
 		  	# event.draggable.snap({ anchors: [prevLoc] })
-		  	console.log event.target
+		  	# console.log event.target
+		  	console.log "Dropped in #{event.target.getAttribute('data-box-category')}"
 		  ondropdeactivate: (event) ->
 		    # remove active dropzone feedback
 		    event.target.classList.remove 'drop-active'
@@ -77,8 +82,11 @@ hypothesisBox = ->
 		      right: 1
 		  onmove: (event) ->
 		    target = event.target
-		    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx
-		    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy
+		    translateFactor = 1
+		    if scroller and scroller.__zoomLevel < 1
+		    	translateFactor = 1.5
+		    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx * translateFactor 
+		    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy * translateFactor
 		    # translate the element
 		    target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
 		    # update the posiion attributes
