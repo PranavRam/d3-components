@@ -235,7 +235,7 @@ module.exports = bubbleChart;
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupInteract, title, width;
+  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupDropzone, setupInteract, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -259,8 +259,44 @@ evidenceBox = function() {
   label = 4;
   hideBody = false;
   drag = true;
+  setupDropzone = function() {
+    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").dropzone({
+      accept: '[data-type="entity"]',
+      overlap: 0.1,
+      ondropactivate: function(event) {
+        return event.target.classList.add('drop-active');
+      },
+      ondragenter: function(event) {
+        var draggableElement, dropzoneElement;
+        draggableElement = event.relatedTarget;
+        dropzoneElement = event.target;
+        dropzoneElement.classList.add('drop-target');
+        return draggableElement.classList.add('can-drop');
+      },
+      ondragleave: function(event) {
+        console.log('left');
+        event.target.classList.remove('drop-target');
+        return event.relatedTarget.classList.remove('can-drop');
+      },
+      ondrop: function(event) {
+        var x, y;
+        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+        event.relatedTarget.classList.add('Dropped');
+        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        event.relatedTarget.setAttribute('data-x', x);
+        event.relatedTarget.setAttribute('data-y', y);
+        return console.log(event);
+      },
+      ondropdeactivate: function(event) {
+        event.target.classList.remove('drop-active');
+        return event.target.classList.remove('drop-target');
+      }
+    });
+  };
   setupInteract = function() {
-    return interact('.draggable').draggable({
+    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").draggable({
       inertia: true,
       restrict: {
         restriction: 'parent',
@@ -291,7 +327,8 @@ evidenceBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, evidenceDivs, heading;
-      div = d3.select(this).attr('class', 'panel panel-primary draggable', {
+      div = d3.select(this).attr({
+        'class': 'panel panel-primary draggable',
         'data-box-type': 'evidence',
         'data-box-number': number
       });
@@ -334,8 +371,9 @@ evidenceBox = function() {
         'margin-top': '2px'
       }).text(label);
       if (drag) {
-        return setupInteract();
+        setupInteract();
       }
+      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -393,7 +431,7 @@ var hypothesisBox, pnnBox;
 pnnBox = require('./pnnBox');
 
 hypothesisBox = function() {
-  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupInteract, title, width;
+  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupDropzone, setupInteract, title, width;
   width = 600;
   height = 400;
   number = 0;
@@ -418,8 +456,44 @@ hypothesisBox = function() {
   label = 5;
   hideBody = false;
   drag = true;
-  setupInteract = function() {
-    return interact('.draggable').draggable({
+  setupDropzone = function() {
+    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
+      accept: '[data-box-type="evidence"]',
+      overlap: 0.5,
+      ondropactivate: function(event) {
+        return event.target.classList.add('drop-active');
+      },
+      ondragenter: function(event) {
+        var draggableElement, dropzoneElement;
+        draggableElement = event.relatedTarget;
+        dropzoneElement = event.target;
+        dropzoneElement.classList.add('drop-target');
+        return draggableElement.classList.add('can-drop');
+      },
+      ondragleave: function(event) {
+        console.log('left');
+        event.target.classList.remove('drop-target');
+        return event.relatedTarget.classList.remove('can-drop');
+      },
+      ondrop: function(event) {
+        var x, y;
+        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+        event.relatedTarget.classList.add('Dropped');
+        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        event.relatedTarget.setAttribute('data-x', x);
+        event.relatedTarget.setAttribute('data-y', y);
+        return console.log(event.target);
+      },
+      ondropdeactivate: function(event) {
+        event.target.classList.remove('drop-active');
+        return event.target.classList.remove('drop-target');
+      }
+    });
+  };
+  setupInteract = function(sel) {
+    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "']").draggable({
       inertia: true,
       restrict: {
         restriction: 'parent',
@@ -450,7 +524,8 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr('class', 'panel panel-dark draggable', {
+      div = d3.select(this).attr({
+        'class': 'panel panel-dark draggable',
         'data-box-type': 'hypothesis',
         'data-box-number': number
       });
@@ -497,8 +572,9 @@ hypothesisBox = function() {
         'margin': '2px 5px'
       }).text(label);
       if (drag) {
-        return setupInteract();
+        setupInteract();
       }
+      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -610,10 +686,10 @@ pnnBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading;
-      console.log(data);
-      div = d3.select(this).attr('class', function(d) {
-        return "pnn panel " + titleClass + " dropzone";
-      }, {
+      div = d3.select(this).attr({
+        'class': function(d) {
+          return "pnn panel " + titleClass;
+        },
         'data-box-type': 'pnn'
       });
       div.style({
@@ -621,7 +697,7 @@ pnnBox = function() {
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
-      body = div.append('div').attr('class', 'panel-body dropzone');
+      body = div.append('div').attr('class', 'panel-body');
       evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
         return d;
       }).style({
@@ -631,12 +707,12 @@ pnnBox = function() {
         'margin-top': '2px'
       }).on('click', function(d, i) {
         data.splice(i, 1);
-        evidences = body.selectAll('div').data(data).exit().remove();
-        return evidences.data(data).text(function(d) {
+        evidences.data(data).text(function(d) {
           return d;
         }).style({
           margin: '5px 0'
         });
+        return evidences = body.selectAll('div').data(data).exit().remove();
       });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
@@ -819,7 +895,7 @@ module.exports = legendChart;
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupInteract, title, width;
+  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupDropzone, setupInteract, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -843,8 +919,44 @@ evidenceBox = function() {
   label = 4;
   hideBody = false;
   drag = true;
+  setupDropzone = function() {
+    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").dropzone({
+      accept: '[data-type="entity"]',
+      overlap: 0.1,
+      ondropactivate: function(event) {
+        return event.target.classList.add('drop-active');
+      },
+      ondragenter: function(event) {
+        var draggableElement, dropzoneElement;
+        draggableElement = event.relatedTarget;
+        dropzoneElement = event.target;
+        dropzoneElement.classList.add('drop-target');
+        return draggableElement.classList.add('can-drop');
+      },
+      ondragleave: function(event) {
+        console.log('left');
+        event.target.classList.remove('drop-target');
+        return event.relatedTarget.classList.remove('can-drop');
+      },
+      ondrop: function(event) {
+        var x, y;
+        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+        event.relatedTarget.classList.add('Dropped');
+        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        event.relatedTarget.setAttribute('data-x', x);
+        event.relatedTarget.setAttribute('data-y', y);
+        return console.log(event);
+      },
+      ondropdeactivate: function(event) {
+        event.target.classList.remove('drop-active');
+        return event.target.classList.remove('drop-target');
+      }
+    });
+  };
   setupInteract = function() {
-    return interact('.draggable').draggable({
+    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").draggable({
       inertia: true,
       restrict: {
         restriction: 'parent',
@@ -875,7 +987,8 @@ evidenceBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, evidenceDivs, heading;
-      div = d3.select(this).attr('class', 'panel panel-primary draggable', {
+      div = d3.select(this).attr({
+        'class': 'panel panel-primary draggable',
         'data-box-type': 'evidence',
         'data-box-number': number
       });
@@ -918,8 +1031,9 @@ evidenceBox = function() {
         'margin-top': '2px'
       }).text(label);
       if (drag) {
-        return setupInteract();
+        setupInteract();
       }
+      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -975,7 +1089,7 @@ var hypothesisBox, pnnBox;
 pnnBox = require('./pnnBox');
 
 hypothesisBox = function() {
-  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupInteract, title, width;
+  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupDropzone, setupInteract, title, width;
   width = 600;
   height = 400;
   number = 0;
@@ -1000,8 +1114,44 @@ hypothesisBox = function() {
   label = 5;
   hideBody = false;
   drag = true;
-  setupInteract = function() {
-    return interact('.draggable').draggable({
+  setupDropzone = function() {
+    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
+      accept: '[data-box-type="evidence"]',
+      overlap: 0.5,
+      ondropactivate: function(event) {
+        return event.target.classList.add('drop-active');
+      },
+      ondragenter: function(event) {
+        var draggableElement, dropzoneElement;
+        draggableElement = event.relatedTarget;
+        dropzoneElement = event.target;
+        dropzoneElement.classList.add('drop-target');
+        return draggableElement.classList.add('can-drop');
+      },
+      ondragleave: function(event) {
+        console.log('left');
+        event.target.classList.remove('drop-target');
+        return event.relatedTarget.classList.remove('can-drop');
+      },
+      ondrop: function(event) {
+        var x, y;
+        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+        event.relatedTarget.classList.add('Dropped');
+        x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
+        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        event.relatedTarget.setAttribute('data-x', x);
+        event.relatedTarget.setAttribute('data-y', y);
+        return console.log(event.target);
+      },
+      ondropdeactivate: function(event) {
+        event.target.classList.remove('drop-active');
+        return event.target.classList.remove('drop-target');
+      }
+    });
+  };
+  setupInteract = function(sel) {
+    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "']").draggable({
       inertia: true,
       restrict: {
         restriction: 'parent',
@@ -1032,7 +1182,8 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr('class', 'panel panel-dark draggable', {
+      div = d3.select(this).attr({
+        'class': 'panel panel-dark draggable',
         'data-box-type': 'hypothesis',
         'data-box-number': number
       });
@@ -1079,8 +1230,9 @@ hypothesisBox = function() {
         'margin': '2px 5px'
       }).text(label);
       if (drag) {
-        return setupInteract();
+        setupInteract();
       }
+      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -1272,41 +1424,6 @@ box1 = d3.select('#evidence').data([0]).call(eBox);
 
 box2 = d3.select('#hypothesis').data([0]).call(hBox);
 
-interact('.dropzone').dropzone({
-  accept: '#yes-drop',
-  overlap: 0.1,
-  ondropactivate: function(event) {
-    return event.target.classList.add('drop-active');
-  },
-  ondragenter: function(event) {
-    var draggableElement, dropzoneElement;
-    draggableElement = event.relatedTarget;
-    dropzoneElement = event.target;
-    dropzoneElement.classList.add('drop-target');
-    return draggableElement.classList.add('can-drop');
-  },
-  ondragleave: function(event) {
-    console.log('left');
-    event.target.classList.remove('drop-target');
-    return event.relatedTarget.classList.remove('can-drop');
-  },
-  ondrop: function(event) {
-    var x, y;
-    event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
-    event.relatedTarget.classList.add('Dropped');
-    x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft;
-    y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10;
-    event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-    event.relatedTarget.setAttribute('data-x', x);
-    event.relatedTarget.setAttribute('data-y', y);
-    return console.log(event);
-  },
-  ondropdeactivate: function(event) {
-    event.target.classList.remove('drop-active');
-    return event.target.classList.remove('drop-target');
-  }
-});
-
 interact('.draggable.entity').draggable({
   inertia: true,
   restrict: {
@@ -1394,10 +1511,10 @@ pnnBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading;
-      console.log(data);
-      div = d3.select(this).attr('class', function(d) {
-        return "pnn panel " + titleClass + " dropzone";
-      }, {
+      div = d3.select(this).attr({
+        'class': function(d) {
+          return "pnn panel " + titleClass;
+        },
         'data-box-type': 'pnn'
       });
       div.style({
@@ -1405,7 +1522,7 @@ pnnBox = function() {
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
-      body = div.append('div').attr('class', 'panel-body dropzone');
+      body = div.append('div').attr('class', 'panel-body');
       evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
         return d;
       }).style({
@@ -1415,12 +1532,12 @@ pnnBox = function() {
         'margin-top': '2px'
       }).on('click', function(d, i) {
         data.splice(i, 1);
-        evidences = body.selectAll('div').data(data).exit().remove();
-        return evidences.data(data).text(function(d) {
+        evidences.data(data).text(function(d) {
           return d;
         }).style({
           margin: '5px 0'
         });
+        return evidences = body.selectAll('div').data(data).exit().remove();
       });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
@@ -1616,10 +1733,10 @@ pnnBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, heading;
-      console.log(data);
-      div = d3.select(this).attr('class', function(d) {
-        return "pnn panel " + titleClass + " dropzone";
-      }, {
+      div = d3.select(this).attr({
+        'class': function(d) {
+          return "pnn panel " + titleClass;
+        },
         'data-box-type': 'pnn'
       });
       div.style({
@@ -1627,7 +1744,7 @@ pnnBox = function() {
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
-      body = div.append('div').attr('class', 'panel-body dropzone');
+      body = div.append('div').attr('class', 'panel-body');
       evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
         return d;
       }).style({
@@ -1637,12 +1754,12 @@ pnnBox = function() {
         'margin-top': '2px'
       }).on('click', function(d, i) {
         data.splice(i, 1);
-        evidences = body.selectAll('div').data(data).exit().remove();
-        return evidences.data(data).text(function(d) {
+        evidences.data(data).text(function(d) {
           return d;
         }).style({
           margin: '5px 0'
         });
+        return evidences = body.selectAll('div').data(data).exit().remove();
       });
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'

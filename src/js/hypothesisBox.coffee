@@ -24,8 +24,47 @@ hypothesisBox = ->
 	hideBody = false
 	drag = true
 
-	setupInteract = ->
-		interact('.draggable')
+	setupDropzone =  ->
+		interact("[data-box-type='hypothesis'][data-box-number='#{number}'] [data-box-type='pnn']").dropzone
+		  accept: '[data-box-type="evidence"]'
+		  overlap: 0.5
+		  ondropactivate: (event) ->
+		    # add active dropzone feedback
+		    event.target.classList.add 'drop-active'
+		  ondragenter: (event) ->
+		    draggableElement = event.relatedTarget
+		    dropzoneElement = event.target
+		    # feedback the possibility of a drop
+		    dropzoneElement.classList.add 'drop-target'
+		    draggableElement.classList.add 'can-drop'
+		    # draggableElement.textContent = 'Dragged in'
+		  ondragleave: (event) ->
+		    # remove the drop feedback style
+		    console.log 'left'
+		    event.target.classList.remove 'drop-target'
+		    event.relatedTarget.classList.remove 'can-drop'
+		    # event.relatedTarget.textContent = 'Dragged out'
+		  ondrop: (event) ->
+		  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
+		  	event.relatedTarget.classList.add 'Dropped'
+
+		  	# x = event.dragEvent.dx * -1
+		  	x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
+		  	# # y = event.dragEvent.dy * -1
+		  	y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
+		  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+		  	# # update the posiion attributes
+		  	event.relatedTarget.setAttribute 'data-x', x
+		  	event.relatedTarget.setAttribute 'data-y', y
+		  	# event.draggable.snap({ anchors: [prevLoc] })
+		  	console.log event.target
+		  ondropdeactivate: (event) ->
+		    # remove active dropzone feedback
+		    event.target.classList.remove 'drop-active'
+		    event.target.classList.remove 'drop-target'
+
+	setupInteract = (sel)->
+		interact("[data-box-type='hypothesis'][data-box-number='#{number}']")
 		.draggable
 		  inertia: true
 		  restrict:
@@ -51,11 +90,11 @@ hypothesisBox = ->
 		.allowFrom '.panel-heading'
 
 	chart = (selection)->
-		# console.log hypothesis
+		# console.log selection[0][0]
 		selection.each (data)->
 			div = d3.select(this)
 				.attr(
-					'class', 'panel panel-dark draggable'
+					'class': 'panel panel-dark draggable'
 					'data-box-type': 'hypothesis'
 					'data-box-number': number)
 
@@ -76,7 +115,7 @@ hypothesisBox = ->
 			# negativeBox = hypothesisBox().title('Negative')
 			# neutralBox = hypothesisBox().title('Neutral')
 
-
+			# console.log [hypothesis.positive.data]
 			positiveDiv = body
 									.append('div')
 									.data([hypothesis.positive.data])
@@ -153,6 +192,7 @@ hypothesisBox = ->
 				.text label
 
 			if drag then setupInteract()
+			setupDropzone()
 
 	chart.width = (value)->
 		if !arguments.length then return width

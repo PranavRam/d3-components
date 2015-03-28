@@ -51,12 +51,12 @@ pnnBox = ->
 	chart = (selection)->
 		# console.log arguments
 		selection.each (data)->
-			console.log data
+			# console.log data
 			div = d3.select(this)
 				.attr(
-					'class', (d)-> "pnn panel #{titleClass} dropzone"
+					'class': (d)-> "pnn panel #{titleClass}"
 					'data-box-type': 'pnn')
-
+			# console.log div.attr('data-box-type', 'pnn')
 			div
 				.style
 					'min-width': width+'px'
@@ -66,7 +66,7 @@ pnnBox = ->
 
 			heading.text title
 
-			body = div.append('div').attr 'class', 'panel-body dropzone'
+			body = div.append('div').attr 'class', 'panel-body'
 			# console.log body.data()
 			evidences = body
 										.selectAll('div')
@@ -83,14 +83,15 @@ pnnBox = ->
 										'margin-top': '2px'
 									.on 'click', (d, i)->
 										data.splice(i, 1)
-										evidences = body
-											.selectAll('div')
-											.data data
-											.exit().remove()
+										# console.log data, d, i
 										evidences.data data
 											.text (d)-> d
 											.style
 												margin: '5px 0'
+										evidences = body
+											.selectAll('div')
+											.data data
+											.exit().remove()
 
 
 			headingButtons.label = heading

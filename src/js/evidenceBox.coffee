@@ -21,8 +21,47 @@ evidenceBox = ->
 	hideBody = false
 	drag = true
 
+	setupDropzone = ->
+		interact("[data-box-type='evidence'][data-box-number='#{number}']").dropzone
+		  accept: '[data-type="entity"]'
+		  overlap: 0.1
+		  ondropactivate: (event) ->
+		    # add active dropzone feedback
+		    event.target.classList.add 'drop-active'
+		  ondragenter: (event) ->
+		    draggableElement = event.relatedTarget
+		    dropzoneElement = event.target
+		    # feedback the possibility of a drop
+		    dropzoneElement.classList.add 'drop-target'
+		    draggableElement.classList.add 'can-drop'
+		    # draggableElement.textContent = 'Dragged in'
+		  ondragleave: (event) ->
+		    # remove the drop feedback style
+		    console.log 'left'
+		    event.target.classList.remove 'drop-target'
+		    event.relatedTarget.classList.remove 'can-drop'
+		    # event.relatedTarget.textContent = 'Dragged out'
+		  ondrop: (event) ->
+		  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
+		  	event.relatedTarget.classList.add 'Dropped'
+
+		  	# x = event.dragEvent.dx * -1
+		  	x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
+		  	# # y = event.dragEvent.dy * -1
+		  	y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
+		  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+		  	# # update the posiion attributes
+		  	event.relatedTarget.setAttribute 'data-x', x
+		  	event.relatedTarget.setAttribute 'data-y', y
+		  	# event.draggable.snap({ anchors: [prevLoc] })
+		  	console.log event
+		  ondropdeactivate: (event) ->
+		    # remove active dropzone feedback
+		    event.target.classList.remove 'drop-active'
+		    event.target.classList.remove 'drop-target'
+
 	setupInteract = ->
-		interact('.draggable')
+		interact("[data-box-type='evidence'][data-box-number='#{number}']")
 		.draggable
 		  inertia: true
 		  restrict:
@@ -51,7 +90,7 @@ evidenceBox = ->
 		selection.each (data)->
 			div = d3.select(this)
 				.attr(
-					'class', 'panel panel-primary draggable'
+					'class': 'panel panel-primary draggable'
 					'data-box-type': 'evidence'
 					'data-box-number': number)
 
@@ -112,8 +151,9 @@ evidenceBox = ->
 				.style
 					'margin-top': '2px'
 				.text label
-
+			# console.log body
 			if drag then setupInteract()
+			setupDropzone()
 
 	chart.width = (value)->
 		if !arguments.length then return width
