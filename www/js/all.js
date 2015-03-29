@@ -485,17 +485,16 @@ hypothesisBox = function() {
         return event.relatedTarget.classList.remove('can-drop');
       },
       ondrop: function(event) {
-        var translateFactor, x, y;
+        var x, y, zoom;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1;
-        }
         console.log(event.interaction);
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor;
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
+        zoom = scroller.getValues().zoom;
+        scroller.zoomTo(1);
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        scroller.zoomTo(zoom);
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
         return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
@@ -1162,17 +1161,16 @@ hypothesisBox = function() {
         return event.relatedTarget.classList.remove('can-drop');
       },
       ondrop: function(event) {
-        var translateFactor, x, y;
+        var x, y, zoom;
         event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
         event.relatedTarget.classList.add('Dropped');
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1;
-        }
         console.log(event.interaction);
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor;
+        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
+        zoom = scroller.getValues().zoom;
+        scroller.zoomTo(1);
         event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+        scroller.zoomTo(zoom);
         event.relatedTarget.setAttribute('data-x', x);
         event.relatedTarget.setAttribute('data-y', y);
         return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));

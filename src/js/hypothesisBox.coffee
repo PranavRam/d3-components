@@ -48,15 +48,15 @@ hypothesisBox = ->
 		  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
 		  	event.relatedTarget.classList.add 'Dropped'
 
-		  	translateFactor = 1
-		  	if scroller and scroller.__zoomLevel < 1
-		  		translateFactor = 1
 		  	# x = event.dragEvent.dx * -1
 		  	console.log event.interaction
-		  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX * translateFactor
+		  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX
 		  	# # y = event.dragEvent.dy * -1
-		  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY * translateFactor
+		  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY
+		  	zoom = scroller.getValues().zoom
+		  	scroller.zoomTo(1)
 		  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+		  	scroller.zoomTo(zoom)
 		  	# # update the posiion attributes
 		  	event.relatedTarget.setAttribute 'data-x', x
 		  	event.relatedTarget.setAttribute 'data-y', y
