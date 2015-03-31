@@ -485,9 +485,9 @@ hypothesisBox = function() {
         visibility: 'hidden'
       }).call(achBottomBar);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number);
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number);
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number);
       positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
       negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
       neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
@@ -581,23 +581,12 @@ module.exports = hypothesisBox;
 var pnnBox;
 
 pnnBox = function() {
-  var chart, evidences, headingButtons, height, label, title, titleClass, width;
+  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
-  evidences = [
-    {
-      name: 'Anand',
-      type: 'label-success'
-    }, {
-      name: 'GT',
-      type: 'label-info'
-    }, {
-      name: '2011',
-      type: 'label-warning'
-    }
-  ];
+  parentBox = -1;
   headingButtons = {
     chevron: null,
     label: null,
@@ -607,9 +596,9 @@ pnnBox = function() {
   label = 5;
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
       removeItems = function(d, i) {
-        var plusMinus, trash;
+        var evidences, plusMinus, trash;
         data.splice(i, 1);
         evidences.data(data).text(function(d) {
           return d;
@@ -645,6 +634,7 @@ pnnBox = function() {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
+        'data-parent-box': parentBox || 0,
         'data-box-category': title
       });
       div.style({
@@ -686,11 +676,11 @@ pnnBox = function() {
     title = value;
     return chart;
   };
-  chart.evidences = function(value) {
+  chart.parentBox = function(value) {
     if (!arguments.length) {
-      return evidences;
+      return parentBox;
     }
-    evidences = value;
+    parentBox = value;
     return chart;
   };
   chart.label = function(value) {
@@ -1050,9 +1040,9 @@ hypothesisBox = function() {
         visibility: 'hidden'
       }).call(achBottomBar);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number);
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number);
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number);
       positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
       negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
       neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
@@ -1210,7 +1200,7 @@ labColorPicker = function() {
 module.exports = labColorPicker;
 
 },{}],5:[function(require,module,exports){
-var box1, box2, container, content, eBox, evidenceBox, group, height, hypothesisBox, labColorPicker, margin, offset, picker, setupDragForEvidences, setupDragForHypotheses, setupDropzoneForEvidences, setupDropzoneForHypothesesPNN, sliderControl, svg, width;
+var box1, box2, container, content, eBox, evidenceBox, group, hBox, height, hypothesisBox, labColorPicker, margin, offset, picker, setupDragForEvidences, setupDragForHypotheses, setupDropzoneForEvidences, setupDropzoneForHypothesesPNN, sliderControl, svg, width;
 
 sliderControl = require('./sliderControl');
 
@@ -1277,7 +1267,7 @@ group = svg.append('g').attr({
 
 eBox = evidenceBox();
 
-window.hBox = hypothesisBox();
+hBox = hypothesisBox();
 
 box1 = d3.select('#evidence').data([0]).call(eBox);
 
@@ -1311,6 +1301,7 @@ setupDropzoneForEvidences = function() {
       event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
       event.relatedTarget.setAttribute('data-x', x);
       event.relatedTarget.setAttribute('data-y', y);
+      alert("added " + (event.relatedTarget.getAttribute('entity-name')));
       return console.log(event);
     },
     ondropdeactivate: function(event) {
@@ -1340,9 +1331,13 @@ setupDropzoneForHypothesesPNN = function() {
       return event.relatedTarget.classList.remove('can-drop');
     },
     ondrop: function(event) {
-      var x, y, zoom;
+      var box, data, x, y, zoom;
       event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
       event.relatedTarget.classList.add('Dropped');
+      box = d3.select(event.target).selectAll('div.evidence');
+      data = box.data();
+      data.push('Evidence 20');
+      console.log(box, data);
       console.log(event.interaction);
       x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
       y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
@@ -1352,7 +1347,7 @@ setupDropzoneForHypothesesPNN = function() {
       scroller.zoomTo(zoom);
       event.relatedTarget.setAttribute('data-x', x);
       event.relatedTarget.setAttribute('data-y', y);
-      return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
+      return alert("Dropped " + (event.relatedTarget.getAttribute('data-box-type')) + " in " + (event.target.getAttribute('data-box-category')) + " under Hypothesis" + (event.target.getAttribute('data-parent-box')));
     },
     ondropdeactivate: function(event) {
       event.target.classList.remove('drop-active');
@@ -1489,23 +1484,12 @@ content.style.height = contentHeight + 'px';
 var pnnBox;
 
 pnnBox = function() {
-  var chart, evidences, headingButtons, height, label, title, titleClass, width;
+  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
-  evidences = [
-    {
-      name: 'Anand',
-      type: 'label-success'
-    }, {
-      name: 'GT',
-      type: 'label-info'
-    }, {
-      name: '2011',
-      type: 'label-warning'
-    }
-  ];
+  parentBox = -1;
   headingButtons = {
     chevron: null,
     label: null,
@@ -1515,9 +1499,9 @@ pnnBox = function() {
   label = 5;
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
       removeItems = function(d, i) {
-        var plusMinus, trash;
+        var evidences, plusMinus, trash;
         data.splice(i, 1);
         evidences.data(data).text(function(d) {
           return d;
@@ -1553,6 +1537,7 @@ pnnBox = function() {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
+        'data-parent-box': parentBox || 0,
         'data-box-category': title
       });
       div.style({
@@ -1594,11 +1579,11 @@ pnnBox = function() {
     title = value;
     return chart;
   };
-  chart.evidences = function(value) {
+  chart.parentBox = function(value) {
     if (!arguments.length) {
-      return evidences;
+      return parentBox;
     }
-    evidences = value;
+    parentBox = value;
     return chart;
   };
   chart.label = function(value) {
@@ -1705,23 +1690,12 @@ module.exports = sliderControl;
 var pnnBox;
 
 pnnBox = function() {
-  var chart, evidences, headingButtons, height, label, title, titleClass, width;
+  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
-  evidences = [
-    {
-      name: 'Anand',
-      type: 'label-success'
-    }, {
-      name: 'GT',
-      type: 'label-info'
-    }, {
-      name: '2011',
-      type: 'label-warning'
-    }
-  ];
+  parentBox = -1;
   headingButtons = {
     chevron: null,
     label: null,
@@ -1731,9 +1705,9 @@ pnnBox = function() {
   label = 5;
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
       removeItems = function(d, i) {
-        var plusMinus, trash;
+        var evidences, plusMinus, trash;
         data.splice(i, 1);
         evidences.data(data).text(function(d) {
           return d;
@@ -1769,6 +1743,7 @@ pnnBox = function() {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
+        'data-parent-box': parentBox || 0,
         'data-box-category': title
       });
       div.style({
@@ -1810,11 +1785,11 @@ pnnBox = function() {
     title = value;
     return chart;
   };
-  chart.evidences = function(value) {
+  chart.parentBox = function(value) {
     if (!arguments.length) {
-      return evidences;
+      return parentBox;
     }
-    evidences = value;
+    parentBox = value;
     return chart;
   };
   chart.label = function(value) {

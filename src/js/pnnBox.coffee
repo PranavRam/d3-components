@@ -3,16 +3,8 @@ pnnBox = ->
 	height = 200
 	title = 'Positive'
 	titleClass = 'panel-info'
-	evidences = [{
-		name:'Anand',
-		type: 'label-success'
-		}, {
-		name: 'GT',
-		type: 'label-info'
-		},{
-		name: '2011',
-		type: 'label-warning'
-	}]
+	parentBox = -1
+
 	headingButtons = 
 		chevron: null
 		label: null
@@ -74,6 +66,7 @@ pnnBox = ->
 				.attr(
 					'class': (d)-> "pnn panel #{titleClass}"
 					'data-box-type': 'pnn'
+					'data-parent-box': parentBox || 0
 					'data-box-category': title)
 			# console.log div.attr('data-box-type', 'pnn')
 			div
@@ -125,9 +118,9 @@ pnnBox = ->
 		title = value
 		chart
 
-	chart.evidences = (value)->
-		if !arguments.length then return evidences
-		evidences = value
+	chart.parentBox = (value)->
+		if !arguments.length then return parentBox
+		parentBox = value
 		chart
 
 	chart.label = (value)->

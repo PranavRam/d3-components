@@ -53,9 +53,9 @@ hypothesisBox = ->
 
 			body = div.append('div').attr 'class', 'panel-body'
 
-			positiveBox = pnnBox().title('Positive').titleClass('panel-info')
-			negativeBox = pnnBox().title('Negative').titleClass('panel-danger')
-			neutralBox = pnnBox().title('Neutral').titleClass('panel-warning')
+			positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number)
+			negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number)
+			neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number)
 			# negativeBox = hypothesisBox().title('Negative')
 			# neutralBox = hypothesisBox().title('Neutral')
 

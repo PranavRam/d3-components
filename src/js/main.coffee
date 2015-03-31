@@ -57,7 +57,7 @@ group = svg.append 'g'
 					.call picker
 
 eBox = evidenceBox()
-window.hBox = hypothesisBox()
+hBox = hypothesisBox()
 
 box1 = d3.select '#evidence'
 					.data [0]
@@ -102,6 +102,7 @@ setupDropzoneForEvidences = ->
 	  	event.relatedTarget.setAttribute 'data-x', x
 	  	event.relatedTarget.setAttribute 'data-y', y
 	  	# event.draggable.snap({ anchors: [prevLoc] })
+	  	alert "added #{event.relatedTarget.getAttribute('entity-name')}"
 	  	console.log event
 	  ondropdeactivate: (event) ->
 	    # remove active dropzone feedback
@@ -131,7 +132,14 @@ setupDropzoneForHypothesesPNN =  ->
 	  ondrop: (event) ->
 	  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
 	  	event.relatedTarget.classList.add 'Dropped'
+	  	# box = d3.select "[data-box-type='hypothesis'][data-parent-box='#{event.target.getAttribute('data-parent-box')}']"
+	  	box = d3.select event.target
+	  						.selectAll 'div.evidence'
+	  	data = box
+	  						.data()
+	  	data.push 'Evidence 20'
 
+	  	console.log box, data
 	  	# x = event.dragEvent.dx * -1
 	  	console.log event.interaction
 	  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX
@@ -146,7 +154,7 @@ setupDropzoneForHypothesesPNN =  ->
 	  	event.relatedTarget.setAttribute 'data-y', y
 	  	# event.draggable.snap({ anchors: [prevLoc] })
 	  	# console.log event.target
-	  	console.log "Dropped in #{event.target.getAttribute('data-box-category')}"
+	  	alert "Dropped #{event.relatedTarget.getAttribute('data-box-type')} in #{event.target.getAttribute('data-box-category')} under Hypothesis#{event.target.getAttribute('data-parent-box')}"
 	  ondropdeactivate: (event) ->
 	    # remove active dropzone feedback
 	    event.target.classList.remove 'drop-active'
