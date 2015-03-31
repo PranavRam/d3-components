@@ -20,38 +20,56 @@ pnnBox = ->
 		lineChart: null
 
 	label = 5
-	drag = true
-
-	setupInteract = ->
-		interact('.draggable')
-		.draggable
-		  inertia: true
-		  restrict:
-		    restriction: 'parent'
-		    endOnly: true
-		    elementRect:
-		      top: 0
-		      left: 0
-		      bottom: 1
-		      right: 1
-		  onmove: (event) ->
-		    target = event.target
-		    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx
-		    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy
-		    # translate the element
-		    target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
-		    # update the posiion attributes
-		    target.setAttribute 'data-x', x
-		    target.setAttribute 'data-y', y
-		  onend: (event) ->
-		    textEl = event.target.querySelector('p')
-		    textEl and (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px')
-		.allowFrom '.panel-heading'
 
 	chart = (selection)->
 		# console.log arguments
 		selection.each (data)->
 			# console.log data
+
+			removeItems = (d,i)->
+				data.splice(i, 1)
+				# console.log data, d, i
+				evidences.data data
+					.text (d)-> d
+					.style
+						margin: '5px 0'
+				# console.log evidences
+				evidences = body
+					.selectAll('div.evidence')
+					.data data
+				trash = evidences.call appendTrash
+				plusMinus = evidences.call appendPlusMinus
+				
+				# console.log evidences	
+				evidences.exit().remove()
+
+			appendPlusMinus = (selection)->
+				selection.each (data)->
+					d3.select this
+						.append('i')
+						.attr 'class', 'fa fa-minus pull-right'
+						.style
+							'margin-top': '4px'
+							'margin-right': '1em'
+						# .on 'click', removeItems
+
+					d3.select this
+						.append('i')
+						.attr 'class', 'fa fa-plus pull-right'
+						.style
+							'margin-top': '4px'
+							'margin-right': '2px'
+						# .on 'click', removeItems
+
+			appendTrash = (selection)->
+				selection.each (data)->
+					d3.select this
+						.append('i')
+						.attr 'class', 'fa fa-trash pull-right'
+						.style
+							'margin-top': '4px'
+						.on 'click', removeItems
+
 			div = d3.select(this)
 				.attr(
 					'class': (d)-> "pnn panel #{titleClass}"
@@ -60,7 +78,7 @@ pnnBox = ->
 			# console.log div.attr('data-box-type', 'pnn')
 			div
 				.style
-					'min-width': width+'px'
+					'min-width': 100+'%'
 					# height: height+'px'
 
 			heading = div.append('div').attr 'class', 'panel-heading'
@@ -70,29 +88,17 @@ pnnBox = ->
 			body = div.append('div').attr 'class', 'panel-body'
 			# console.log body.data()
 			evidences = body
-										.selectAll('div')
+										.selectAll('div.evidence')
 										.data data
 										.enter()
 										.append('div')
+										.attr 'class', 'evidence'
 										.text (d)-> d
 										.style
 											margin: '5px 0'
-			
-			evidences.append('i')
-									.attr 'class', 'fa fa-trash pull-right'
-									.style
-										'margin-top': '2px'
-									.on 'click', (d, i)->
-										data.splice(i, 1)
-										# console.log data, d, i
-										evidences.data data
-											.text (d)-> d
-											.style
-												margin: '5px 0'
-										evidences = body
-											.selectAll('div')
-											.data data
-											.exit().remove()
+
+			trash = evidences.call appendTrash
+			plusMinus = evidences.call appendPlusMinus
 
 
 			headingButtons.label = heading

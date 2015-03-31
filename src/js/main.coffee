@@ -67,6 +67,153 @@ box2 = d3.select '#hypothesis'
 					.data [0]
 					.call hBox
 
+setupDropzoneForEvidences = ->
+	interact("[data-box-type='evidence']").dropzone
+	  accept: '[data-type="entity"]'
+	  overlap: 0.1
+	  ondropactivate: (event) ->
+	    # add active dropzone feedback
+	    event.target.classList.add 'drop-active'
+	  ondragenter: (event) ->
+	    draggableElement = event.relatedTarget
+	    dropzoneElement = event.target
+	    # feedback the possibility of a drop
+	    dropzoneElement.classList.add 'drop-target'
+	    draggableElement.classList.add 'can-drop'
+	    # draggableElement.textContent = 'Dragged in'
+	  ondragleave: (event) ->
+	    # remove the drop feedback style
+	    console.log 'left'
+	    event.target.classList.remove 'drop-target'
+	    event.relatedTarget.classList.remove 'can-drop'
+	    # event.relatedTarget.textContent = 'Dragged out'
+	  ondrop: (event) ->
+	  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
+	  	event.relatedTarget.classList.add 'Dropped'
+
+	  	# x = event.dragEvent.dx * -1
+	  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX
+	  	# x = event.interaction.startCoords.client.x - event.relatedTarget.offsetLeft
+	  	# # y = event.dragEvent.dy * -1
+	  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY
+	  	# y = event.interaction.startCoords.client.y - event.relatedTarget.offsetTop - 10
+	  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+	  	# # update the posiion attributes
+	  	event.relatedTarget.setAttribute 'data-x', x
+	  	event.relatedTarget.setAttribute 'data-y', y
+	  	# event.draggable.snap({ anchors: [prevLoc] })
+	  	console.log event
+	  ondropdeactivate: (event) ->
+	    # remove active dropzone feedback
+	    event.target.classList.remove 'drop-active'
+	    event.target.classList.remove 'drop-target'
+
+setupDropzoneForHypothesesPNN =  ->
+	interact("[data-box-type='hypothesis'] [data-box-type='pnn']").dropzone
+	  accept: '[data-box-type="evidence"]'
+	  overlap: 0.3
+	  ondropactivate: (event) ->
+	    # add active dropzone feedback
+	    event.target.classList.add 'drop-active'
+	  ondragenter: (event) ->
+	    draggableElement = event.relatedTarget
+	    dropzoneElement = event.target
+	    # feedback the possibility of a drop
+	    dropzoneElement.classList.add 'drop-target'
+	    draggableElement.classList.add 'can-drop'
+	    # draggableElement.textContent = 'Dragged in'
+	  ondragleave: (event) ->
+	    # remove the drop feedback style
+	    console.log 'left'
+	    event.target.classList.remove 'drop-target'
+	    event.relatedTarget.classList.remove 'can-drop'
+	    # event.relatedTarget.textContent = 'Dragged out'
+	  ondrop: (event) ->
+	  	event.target.classList.add event.relatedTarget.getAttribute 'entity-name'
+	  	event.relatedTarget.classList.add 'Dropped'
+
+	  	# x = event.dragEvent.dx * -1
+	  	console.log event.interaction
+	  	x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX
+	  	# # y = event.dragEvent.dy * -1
+	  	y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY
+	  	zoom = scroller.getValues().zoom
+	  	scroller.zoomTo(1)
+	  	event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+	  	scroller.zoomTo(zoom)
+	  	# # update the posiion attributes
+	  	event.relatedTarget.setAttribute 'data-x', x
+	  	event.relatedTarget.setAttribute 'data-y', y
+	  	# event.draggable.snap({ anchors: [prevLoc] })
+	  	# console.log event.target
+	  	console.log "Dropped in #{event.target.getAttribute('data-box-category')}"
+	  ondropdeactivate: (event) ->
+	    # remove active dropzone feedback
+	    event.target.classList.remove 'drop-active'
+	    event.target.classList.remove 'drop-target'
+
+setupDragForHypotheses = (sel)->
+	interact("[data-box-type='hypothesis']")
+	.draggable
+	  inertia: true
+	  restrict:
+	    restriction: 'parent'
+	    endOnly: true
+	    elementRect:
+	      top: 0
+	      left: 0
+	      bottom: 1
+	      right: 1
+	  onmove: (event) ->
+	    target = event.target
+	    translateFactor = 1
+	    if scroller and scroller.__zoomLevel < 1
+	    	translateFactor = 1.5
+	    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx * translateFactor 
+	    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy * translateFactor
+	    # translate the element
+	    target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+	    # update the posiion attributes
+	    target.setAttribute 'data-x', x
+	    target.setAttribute 'data-y', y
+	  onend: (event) ->
+	    textEl = event.target.querySelector('p')
+	    textEl and (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px')
+	.allowFrom '.panel-heading'
+
+setupDragForEvidences = ->
+	interact("[data-box-type='evidence']")
+	.draggable
+	  inertia: true
+	  restrict:
+	    restriction: 'parent'
+	    endOnly: true
+	    elementRect:
+	      top: 0
+	      left: 0
+	      bottom: 1
+	      right: 1
+	  onmove: (event) ->
+	    target = event.target
+	    translateFactor = 1
+	    if scroller and scroller.__zoomLevel < 1
+	    	translateFactor = 1.5
+	    x = (parseFloat(target.getAttribute('data-x')) or 0) + event.dx * translateFactor
+	    y = (parseFloat(target.getAttribute('data-y')) or 0) + event.dy * translateFactor
+	    # translate the element
+	    target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)'
+	    # update the posiion attributes
+	    target.setAttribute 'data-x', x
+	    target.setAttribute 'data-y', y
+	  onend: (event) ->
+	    textEl = event.target.querySelector('p')
+	    textEl and (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px')
+	.allowFrom '.panel-heading'
+	.on 'dragstart', (event)->
+		console.log event
+		event.target.originalPosX ||= event.pageX
+		event.target.originalPosY ||= event.pageY
+
 interact('.draggable.entity')
 	.draggable
 	  inertia: true
@@ -101,6 +248,11 @@ interact('.draggable.entity')
   	# 	x : event.pageX - event.target.originalPosX
   	# 	y : event.pageY - event.target.originalPosY
 
+
+setupDragForEvidences()
+setupDragForHypotheses()
+setupDropzoneForEvidences()
+setupDropzoneForHypothesesPNN()
 
 window.contentWidth = 2000
 window.contentHeight = 2000

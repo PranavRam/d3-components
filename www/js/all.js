@@ -1,4 +1,43 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var ACHBar;
+
+ACHBar = function() {
+  var chart, color, height, width;
+  width = null;
+  height = 30;
+  color = d3.scale.linear().domain([0, 1, 2]).range(["green", "red", "yellow"]);
+  chart = function(selection) {
+    return selection.each(function(data) {
+      var barCount, bars, div;
+      div = d3.select(this);
+      div.style({
+        height: height + 'px',
+        width: width || div.style('width')
+      });
+      bars = div.selectAll('div.bar').data(data).enter().append('div').attr('class', 'bar').style({
+        width: function(d) {
+          return ((d / d3.sum(data)) * 100) + "%";
+        },
+        display: 'inline-block',
+        margin: 0,
+        height: height + 'px',
+        'background-color': function(d, i) {
+          return color(i);
+        }
+      });
+      return barCount = bars.text(function(d) {
+        return d;
+      }).style('text-align', 'center');
+    });
+  };
+  return chart;
+};
+
+module.exports = ACHBar;
+
+},{}]},{},[1]);
+
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var barcodeChart;
 
 barcodeChart = function() {
@@ -235,7 +274,7 @@ module.exports = bubbleChart;
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupDropzone, setupInteract, title, width;
+  var chart, evidences, headingButtons, height, hideBody, label, number, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -254,85 +293,11 @@ evidenceBox = function() {
   ];
   headingButtons = {
     chevron: null,
-    label: null
+    label: null,
+    add: null
   };
   label = 4;
   hideBody = false;
-  drag = true;
-  setupDropzone = function() {
-    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").dropzone({
-      accept: '[data-type="entity"]',
-      overlap: 0.1,
-      ondropactivate: function(event) {
-        return event.target.classList.add('drop-active');
-      },
-      ondragenter: function(event) {
-        var draggableElement, dropzoneElement;
-        draggableElement = event.relatedTarget;
-        dropzoneElement = event.target;
-        dropzoneElement.classList.add('drop-target');
-        return draggableElement.classList.add('can-drop');
-      },
-      ondragleave: function(event) {
-        console.log('left');
-        event.target.classList.remove('drop-target');
-        return event.relatedTarget.classList.remove('can-drop');
-      },
-      ondrop: function(event) {
-        var x, y;
-        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
-        event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
-        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        event.relatedTarget.setAttribute('data-x', x);
-        event.relatedTarget.setAttribute('data-y', y);
-        return console.log(event);
-      },
-      ondropdeactivate: function(event) {
-        event.target.classList.remove('drop-active');
-        return event.target.classList.remove('drop-target');
-      }
-    });
-  };
-  setupInteract = function() {
-    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, translateFactor, x, y;
-        target = event.target;
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1.5;
-        }
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading').on('dragstart', function(event) {
-      var base, base1;
-      console.log(event);
-      (base = event.target).originalPosX || (base.originalPosX = event.pageX);
-      return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
-    });
-  };
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, evidenceDivs, heading;
@@ -356,14 +321,13 @@ evidenceBox = function() {
         margin: '5px'
       });
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '2px'
+        'margin-top': '4px'
       }).on('click', function(d) {
         if (!hideBody) {
           body.style({
             display: 'none',
             visibility: 'hidden'
           });
-          div.style('height', '43px');
           d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
           return hideBody = true;
         } else {
@@ -376,13 +340,12 @@ evidenceBox = function() {
           return hideBody = false;
         }
       });
-      headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin-top': '2px'
+      headingButtons.add = heading.append('i').attr('class', 'fa fa-plus pull-right').style({
+        'margin-top': '4px'
+      });
+      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+        'margin-top': '4px'
       }).text(label);
-      if (drag) {
-        setupInteract();
-      }
-      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -435,13 +398,52 @@ module.exports = evidenceBox;
 },{}]},{},[1]);
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var hypothesisBox, pnnBox;
+var ACHBar;
+
+ACHBar = function() {
+  var chart, color, height, width;
+  width = null;
+  height = 30;
+  color = d3.scale.linear().domain([0, 1, 2]).range(["green", "red", "yellow"]);
+  chart = function(selection) {
+    return selection.each(function(data) {
+      var barCount, bars, div;
+      div = d3.select(this);
+      div.style({
+        height: height + 'px',
+        width: width || div.style('width')
+      });
+      bars = div.selectAll('div.bar').data(data).enter().append('div').attr('class', 'bar').style({
+        width: function(d) {
+          return ((d / d3.sum(data)) * 100) + "%";
+        },
+        display: 'inline-block',
+        margin: 0,
+        height: height + 'px',
+        'background-color': function(d, i) {
+          return color(i);
+        }
+      });
+      return barCount = bars.text(function(d) {
+        return d;
+      }).style('text-align', 'center');
+    });
+  };
+  return chart;
+};
+
+module.exports = ACHBar;
+
+},{}],2:[function(require,module,exports){
+var ACHBar, hypothesisBox, pnnBox;
 
 pnnBox = require('./pnnBox');
 
+ACHBar = require('./ACHBar');
+
 hypothesisBox = function() {
-  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupDropzone, setupInteract, title, width;
-  width = 600;
+  var chart, headingButtons, height, hideBody, hypothesis, label, number, title, width;
+  width = 400;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
@@ -464,83 +466,9 @@ hypothesisBox = function() {
   };
   label = 5;
   hideBody = false;
-  drag = true;
-  setupDropzone = function() {
-    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
-      accept: '[data-box-type="evidence"]',
-      overlap: 0.3,
-      ondropactivate: function(event) {
-        return event.target.classList.add('drop-active');
-      },
-      ondragenter: function(event) {
-        var draggableElement, dropzoneElement;
-        draggableElement = event.relatedTarget;
-        dropzoneElement = event.target;
-        dropzoneElement.classList.add('drop-target');
-        return draggableElement.classList.add('can-drop');
-      },
-      ondragleave: function(event) {
-        console.log('left');
-        event.target.classList.remove('drop-target');
-        return event.relatedTarget.classList.remove('can-drop');
-      },
-      ondrop: function(event) {
-        var x, y, zoom;
-        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
-        event.relatedTarget.classList.add('Dropped');
-        console.log(event.interaction);
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
-        zoom = scroller.getValues().zoom;
-        scroller.zoomTo(1);
-        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        scroller.zoomTo(zoom);
-        event.relatedTarget.setAttribute('data-x', x);
-        event.relatedTarget.setAttribute('data-y', y);
-        return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
-      },
-      ondropdeactivate: function(event) {
-        event.target.classList.remove('drop-active');
-        return event.target.classList.remove('drop-target');
-      }
-    });
-  };
-  setupInteract = function(sel) {
-    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "']").draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, translateFactor, x, y;
-        target = event.target;
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1.5;
-        }
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading');
-  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
+      var achBottomBar, body, bottomBar, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
       div = d3.select(this).attr({
         'class': 'panel panel-dark draggable',
         'data-box-type': 'hypothesis',
@@ -551,47 +479,54 @@ hypothesisBox = function() {
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
+      achBottomBar = ACHBar();
+      bottomBar = div.append('div').datum([10, 4, 2]).attr('class', 'ach-bar').style({
+        display: 'none',
+        visibility: 'hidden'
+      }).call(achBottomBar);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info').width(width / 2 - 25);
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger left-15').width(width / 2 - 25);
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').width(width - 35);
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
       positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
       negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
       neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '2px'
+        'margin-top': '4px'
       }).on('click', function(d) {
         if (!hideBody) {
           body.style({
             display: 'none',
             visibility: 'hidden'
           });
-          div.style('height', '43px');
           d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+          bottomBar.style({
+            display: 'block',
+            visibility: 'visible'
+          });
           return hideBody = true;
         } else {
           body.style({
             display: 'block',
             visibility: 'visible'
           });
-          div.style('height', 'auto');
           d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
+          bottomBar.style({
+            display: 'none',
+            visibility: 'hidden'
+          });
           return hideBody = false;
         }
       });
       headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
-        'margin': '2px 5px'
+        'margin': '4px 5px'
       });
       headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
-        'margin': '2px 5px'
+        'margin': '4px 5px'
       });
-      headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin': '2px 5px'
+      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+        'margin': '4px 5px'
       }).text(label);
-      if (drag) {
-        setupInteract();
-      }
-      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -642,11 +577,11 @@ hypothesisBox = function() {
 
 module.exports = hypothesisBox;
 
-},{"./pnnBox":2}],2:[function(require,module,exports){
+},{"./ACHBar":1,"./pnnBox":3}],3:[function(require,module,exports){
 var pnnBox;
 
 pnnBox = function() {
-  var chart, drag, evidences, headingButtons, height, label, setupInteract, title, titleClass, width;
+  var chart, evidences, headingButtons, height, label, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -670,39 +605,41 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
-  drag = true;
-  setupInteract = function() {
-    return interact('.draggable').draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, x, y;
-        target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading');
-  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var body, div, heading;
+      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      removeItems = function(d, i) {
+        var plusMinus, trash;
+        data.splice(i, 1);
+        evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+        evidences = body.selectAll('div.evidence').data(data);
+        trash = evidences.call(appendTrash);
+        plusMinus = evidences.call(appendPlusMinus);
+        return evidences.exit().remove();
+      };
+      appendPlusMinus = function(selection) {
+        return selection.each(function(data) {
+          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '1em'
+          });
+          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '2px'
+          });
+        });
+      };
+      appendTrash = function(selection) {
+        return selection.each(function(data) {
+          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
+            'margin-top': '4px'
+          }).on('click', removeItems);
+        });
+      };
       div = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -711,27 +648,18 @@ pnnBox = function() {
         'data-box-category': title
       });
       div.style({
-        'min-width': width + 'px'
+        'min-width': 100 + '%'
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
         return d;
       }).style({
         margin: '5px 0'
       });
-      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
-        'margin-top': '2px'
-      }).on('click', function(d, i) {
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        return evidences = body.selectAll('div').data(data).exit().remove();
-      });
+      trash = evidences.call(appendTrash);
+      plusMinus = evidences.call(appendPlusMinus);
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
@@ -784,7 +712,7 @@ pnnBox = function() {
 
 module.exports = pnnBox;
 
-},{}]},{},[1]);
+},{}]},{},[2]);
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var labColorPicker;
@@ -910,10 +838,47 @@ module.exports = legendChart;
 },{}]},{},[1]);
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+var ACHBar;
+
+ACHBar = function() {
+  var chart, color, height, width;
+  width = null;
+  height = 30;
+  color = d3.scale.linear().domain([0, 1, 2]).range(["green", "red", "yellow"]);
+  chart = function(selection) {
+    return selection.each(function(data) {
+      var barCount, bars, div;
+      div = d3.select(this);
+      div.style({
+        height: height + 'px',
+        width: width || div.style('width')
+      });
+      bars = div.selectAll('div.bar').data(data).enter().append('div').attr('class', 'bar').style({
+        width: function(d) {
+          return ((d / d3.sum(data)) * 100) + "%";
+        },
+        display: 'inline-block',
+        margin: 0,
+        height: height + 'px',
+        'background-color': function(d, i) {
+          return color(i);
+        }
+      });
+      return barCount = bars.text(function(d) {
+        return d;
+      }).style('text-align', 'center');
+    });
+  };
+  return chart;
+};
+
+module.exports = ACHBar;
+
+},{}],2:[function(require,module,exports){
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, drag, evidences, headingButtons, height, hideBody, label, number, setupDropzone, setupInteract, title, width;
+  var chart, evidences, headingButtons, height, hideBody, label, number, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -932,85 +897,11 @@ evidenceBox = function() {
   ];
   headingButtons = {
     chevron: null,
-    label: null
+    label: null,
+    add: null
   };
   label = 4;
   hideBody = false;
-  drag = true;
-  setupDropzone = function() {
-    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").dropzone({
-      accept: '[data-type="entity"]',
-      overlap: 0.1,
-      ondropactivate: function(event) {
-        return event.target.classList.add('drop-active');
-      },
-      ondragenter: function(event) {
-        var draggableElement, dropzoneElement;
-        draggableElement = event.relatedTarget;
-        dropzoneElement = event.target;
-        dropzoneElement.classList.add('drop-target');
-        return draggableElement.classList.add('can-drop');
-      },
-      ondragleave: function(event) {
-        console.log('left');
-        event.target.classList.remove('drop-target');
-        return event.relatedTarget.classList.remove('can-drop');
-      },
-      ondrop: function(event) {
-        var x, y;
-        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
-        event.relatedTarget.classList.add('Dropped');
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
-        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        event.relatedTarget.setAttribute('data-x', x);
-        event.relatedTarget.setAttribute('data-y', y);
-        return console.log(event);
-      },
-      ondropdeactivate: function(event) {
-        event.target.classList.remove('drop-active');
-        return event.target.classList.remove('drop-target');
-      }
-    });
-  };
-  setupInteract = function() {
-    return interact("[data-box-type='evidence'][data-box-number='" + number + "']").draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, translateFactor, x, y;
-        target = event.target;
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1.5;
-        }
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading').on('dragstart', function(event) {
-      var base, base1;
-      console.log(event);
-      (base = event.target).originalPosX || (base.originalPosX = event.pageX);
-      return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
-    });
-  };
   chart = function(selection) {
     return selection.each(function(data) {
       var body, div, evidenceDivs, heading;
@@ -1034,14 +925,13 @@ evidenceBox = function() {
         margin: '5px'
       });
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '2px'
+        'margin-top': '4px'
       }).on('click', function(d) {
         if (!hideBody) {
           body.style({
             display: 'none',
             visibility: 'hidden'
           });
-          div.style('height', '43px');
           d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
           return hideBody = true;
         } else {
@@ -1054,13 +944,12 @@ evidenceBox = function() {
           return hideBody = false;
         }
       });
-      headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin-top': '2px'
+      headingButtons.add = heading.append('i').attr('class', 'fa fa-plus pull-right').style({
+        'margin-top': '4px'
+      });
+      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+        'margin-top': '4px'
       }).text(label);
-      if (drag) {
-        setupInteract();
-      }
-      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -1110,14 +999,16 @@ evidenceBox = function() {
 
 module.exports = evidenceBox;
 
-},{}],2:[function(require,module,exports){
-var hypothesisBox, pnnBox;
+},{}],3:[function(require,module,exports){
+var ACHBar, hypothesisBox, pnnBox;
 
 pnnBox = require('./pnnBox');
 
+ACHBar = require('./ACHBar');
+
 hypothesisBox = function() {
-  var chart, drag, headingButtons, height, hideBody, hypothesis, label, number, setupDropzone, setupInteract, title, width;
-  width = 600;
+  var chart, headingButtons, height, hideBody, hypothesis, label, number, title, width;
+  width = 400;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
@@ -1140,83 +1031,9 @@ hypothesisBox = function() {
   };
   label = 5;
   hideBody = false;
-  drag = true;
-  setupDropzone = function() {
-    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "'] [data-box-type='pnn']").dropzone({
-      accept: '[data-box-type="evidence"]',
-      overlap: 0.3,
-      ondropactivate: function(event) {
-        return event.target.classList.add('drop-active');
-      },
-      ondragenter: function(event) {
-        var draggableElement, dropzoneElement;
-        draggableElement = event.relatedTarget;
-        dropzoneElement = event.target;
-        dropzoneElement.classList.add('drop-target');
-        return draggableElement.classList.add('can-drop');
-      },
-      ondragleave: function(event) {
-        console.log('left');
-        event.target.classList.remove('drop-target');
-        return event.relatedTarget.classList.remove('can-drop');
-      },
-      ondrop: function(event) {
-        var x, y, zoom;
-        event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
-        event.relatedTarget.classList.add('Dropped');
-        console.log(event.interaction);
-        x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
-        y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
-        zoom = scroller.getValues().zoom;
-        scroller.zoomTo(1);
-        event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        scroller.zoomTo(zoom);
-        event.relatedTarget.setAttribute('data-x', x);
-        event.relatedTarget.setAttribute('data-y', y);
-        return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
-      },
-      ondropdeactivate: function(event) {
-        event.target.classList.remove('drop-active');
-        return event.target.classList.remove('drop-target');
-      }
-    });
-  };
-  setupInteract = function(sel) {
-    return interact("[data-box-type='hypothesis'][data-box-number='" + number + "']").draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, translateFactor, x, y;
-        target = event.target;
-        translateFactor = 1;
-        if (scroller && scroller.__zoomLevel < 1) {
-          translateFactor = 1.5;
-        }
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading');
-  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var body, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
+      var achBottomBar, body, bottomBar, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
       div = d3.select(this).attr({
         'class': 'panel panel-dark draggable',
         'data-box-type': 'hypothesis',
@@ -1227,47 +1044,54 @@ hypothesisBox = function() {
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
+      achBottomBar = ACHBar();
+      bottomBar = div.append('div').datum([10, 4, 2]).attr('class', 'ach-bar').style({
+        display: 'none',
+        visibility: 'hidden'
+      }).call(achBottomBar);
       body = div.append('div').attr('class', 'panel-body');
-      positiveBox = pnnBox().title('Positive').titleClass('panel-info').width(width / 2 - 25);
-      negativeBox = pnnBox().title('Negative').titleClass('panel-danger left-15').width(width / 2 - 25);
-      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').width(width - 35);
+      positiveBox = pnnBox().title('Positive').titleClass('panel-info');
+      negativeBox = pnnBox().title('Negative').titleClass('panel-danger');
+      neutralBox = pnnBox().title('Neutral').titleClass('panel-warning');
       positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
       negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
       neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
       headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '2px'
+        'margin-top': '4px'
       }).on('click', function(d) {
         if (!hideBody) {
           body.style({
             display: 'none',
             visibility: 'hidden'
           });
-          div.style('height', '43px');
           d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+          bottomBar.style({
+            display: 'block',
+            visibility: 'visible'
+          });
           return hideBody = true;
         } else {
           body.style({
             display: 'block',
             visibility: 'visible'
           });
-          div.style('height', 'auto');
           d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
+          bottomBar.style({
+            display: 'none',
+            visibility: 'hidden'
+          });
           return hideBody = false;
         }
       });
       headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
-        'margin': '2px 5px'
+        'margin': '4px 5px'
       });
       headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
-        'margin': '2px 5px'
+        'margin': '4px 5px'
       });
-      headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin': '2px 5px'
+      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+        'margin': '4px 5px'
       }).text(label);
-      if (drag) {
-        setupInteract();
-      }
-      return setupDropzone();
     });
   };
   chart.width = function(value) {
@@ -1318,7 +1142,7 @@ hypothesisBox = function() {
 
 module.exports = hypothesisBox;
 
-},{"./pnnBox":5}],3:[function(require,module,exports){
+},{"./ACHBar":1,"./pnnBox":6}],4:[function(require,module,exports){
 var labColorPicker;
 
 labColorPicker = function() {
@@ -1385,8 +1209,8 @@ labColorPicker = function() {
 
 module.exports = labColorPicker;
 
-},{}],4:[function(require,module,exports){
-var box1, box2, container, content, eBox, evidenceBox, group, height, hypothesisBox, labColorPicker, margin, offset, picker, sliderControl, svg, width;
+},{}],5:[function(require,module,exports){
+var box1, box2, container, content, eBox, evidenceBox, group, height, hypothesisBox, labColorPicker, margin, offset, picker, setupDragForEvidences, setupDragForHypotheses, setupDropzoneForEvidences, setupDropzoneForHypothesesPNN, sliderControl, svg, width;
 
 sliderControl = require('./sliderControl');
 
@@ -1459,6 +1283,157 @@ box1 = d3.select('#evidence').data([0]).call(eBox);
 
 box2 = d3.select('#hypothesis').data([0]).call(hBox);
 
+setupDropzoneForEvidences = function() {
+  return interact("[data-box-type='evidence']").dropzone({
+    accept: '[data-type="entity"]',
+    overlap: 0.1,
+    ondropactivate: function(event) {
+      return event.target.classList.add('drop-active');
+    },
+    ondragenter: function(event) {
+      var draggableElement, dropzoneElement;
+      draggableElement = event.relatedTarget;
+      dropzoneElement = event.target;
+      dropzoneElement.classList.add('drop-target');
+      return draggableElement.classList.add('can-drop');
+    },
+    ondragleave: function(event) {
+      console.log('left');
+      event.target.classList.remove('drop-target');
+      return event.relatedTarget.classList.remove('can-drop');
+    },
+    ondrop: function(event) {
+      var x, y;
+      event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+      event.relatedTarget.classList.add('Dropped');
+      x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+      y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
+      event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      event.relatedTarget.setAttribute('data-x', x);
+      event.relatedTarget.setAttribute('data-y', y);
+      return console.log(event);
+    },
+    ondropdeactivate: function(event) {
+      event.target.classList.remove('drop-active');
+      return event.target.classList.remove('drop-target');
+    }
+  });
+};
+
+setupDropzoneForHypothesesPNN = function() {
+  return interact("[data-box-type='hypothesis'] [data-box-type='pnn']").dropzone({
+    accept: '[data-box-type="evidence"]',
+    overlap: 0.3,
+    ondropactivate: function(event) {
+      return event.target.classList.add('drop-active');
+    },
+    ondragenter: function(event) {
+      var draggableElement, dropzoneElement;
+      draggableElement = event.relatedTarget;
+      dropzoneElement = event.target;
+      dropzoneElement.classList.add('drop-target');
+      return draggableElement.classList.add('can-drop');
+    },
+    ondragleave: function(event) {
+      console.log('left');
+      event.target.classList.remove('drop-target');
+      return event.relatedTarget.classList.remove('can-drop');
+    },
+    ondrop: function(event) {
+      var x, y, zoom;
+      event.target.classList.add(event.relatedTarget.getAttribute('entity-name'));
+      event.relatedTarget.classList.add('Dropped');
+      console.log(event.interaction);
+      x = event.interaction.startCoords.client.x - event.relatedTarget.originalPosX;
+      y = event.interaction.startCoords.client.y - event.relatedTarget.originalPosY;
+      zoom = scroller.getValues().zoom;
+      scroller.zoomTo(1);
+      event.relatedTarget.style.webkitTransform = event.relatedTarget.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      scroller.zoomTo(zoom);
+      event.relatedTarget.setAttribute('data-x', x);
+      event.relatedTarget.setAttribute('data-y', y);
+      return console.log("Dropped in " + (event.target.getAttribute('data-box-category')));
+    },
+    ondropdeactivate: function(event) {
+      event.target.classList.remove('drop-active');
+      return event.target.classList.remove('drop-target');
+    }
+  });
+};
+
+setupDragForHypotheses = function(sel) {
+  return interact("[data-box-type='hypothesis']").draggable({
+    inertia: true,
+    restrict: {
+      restriction: 'parent',
+      endOnly: true,
+      elementRect: {
+        top: 0,
+        left: 0,
+        bottom: 1,
+        right: 1
+      }
+    },
+    onmove: function(event) {
+      var target, translateFactor, x, y;
+      target = event.target;
+      translateFactor = 1;
+      if (scroller && scroller.__zoomLevel < 1) {
+        translateFactor = 1.5;
+      }
+      x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+      y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
+      target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      target.setAttribute('data-x', x);
+      return target.setAttribute('data-y', y);
+    },
+    onend: function(event) {
+      var textEl;
+      textEl = event.target.querySelector('p');
+      return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
+    }
+  }).allowFrom('.panel-heading');
+};
+
+setupDragForEvidences = function() {
+  return interact("[data-box-type='evidence']").draggable({
+    inertia: true,
+    restrict: {
+      restriction: 'parent',
+      endOnly: true,
+      elementRect: {
+        top: 0,
+        left: 0,
+        bottom: 1,
+        right: 1
+      }
+    },
+    onmove: function(event) {
+      var target, translateFactor, x, y;
+      target = event.target;
+      translateFactor = 1;
+      if (scroller && scroller.__zoomLevel < 1) {
+        translateFactor = 1.5;
+      }
+      x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx * translateFactor;
+      y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy * translateFactor;
+      target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+      target.setAttribute('data-x', x);
+      return target.setAttribute('data-y', y);
+    },
+    onend: function(event) {
+      var textEl;
+      textEl = event.target.querySelector('p');
+      return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
+    }
+  }).allowFrom('.panel-heading').on('dragstart', function(event) {
+    var base, base1;
+    console.log(event);
+    (base = event.target).originalPosX || (base.originalPosX = event.pageX);
+    return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
+  });
+};
+
 interact('.draggable.entity').draggable({
   inertia: true,
   restrict: {
@@ -1490,6 +1465,14 @@ interact('.draggable.entity').draggable({
   return (base1 = event.target).originalPosY || (base1.originalPosY = event.pageY);
 });
 
+setupDragForEvidences();
+
+setupDragForHypotheses();
+
+setupDropzoneForEvidences();
+
+setupDropzoneForHypothesesPNN();
+
 window.contentWidth = 2000;
 
 window.contentHeight = 2000;
@@ -1502,11 +1485,11 @@ content.style.width = contentWidth + 'px';
 
 content.style.height = contentHeight + 'px';
 
-},{"./evidenceBox":1,"./hypothesisBox":2,"./labColorPicker":3,"./sliderControl":6}],5:[function(require,module,exports){
+},{"./evidenceBox":2,"./hypothesisBox":3,"./labColorPicker":4,"./sliderControl":7}],6:[function(require,module,exports){
 var pnnBox;
 
 pnnBox = function() {
-  var chart, drag, evidences, headingButtons, height, label, setupInteract, title, titleClass, width;
+  var chart, evidences, headingButtons, height, label, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -1530,39 +1513,41 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
-  drag = true;
-  setupInteract = function() {
-    return interact('.draggable').draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, x, y;
-        target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading');
-  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var body, div, heading;
+      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      removeItems = function(d, i) {
+        var plusMinus, trash;
+        data.splice(i, 1);
+        evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+        evidences = body.selectAll('div.evidence').data(data);
+        trash = evidences.call(appendTrash);
+        plusMinus = evidences.call(appendPlusMinus);
+        return evidences.exit().remove();
+      };
+      appendPlusMinus = function(selection) {
+        return selection.each(function(data) {
+          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '1em'
+          });
+          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '2px'
+          });
+        });
+      };
+      appendTrash = function(selection) {
+        return selection.each(function(data) {
+          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
+            'margin-top': '4px'
+          }).on('click', removeItems);
+        });
+      };
       div = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -1571,27 +1556,18 @@ pnnBox = function() {
         'data-box-category': title
       });
       div.style({
-        'min-width': width + 'px'
+        'min-width': 100 + '%'
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
         return d;
       }).style({
         margin: '5px 0'
       });
-      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
-        'margin-top': '2px'
-      }).on('click', function(d, i) {
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        return evidences = body.selectAll('div').data(data).exit().remove();
-      });
+      trash = evidences.call(appendTrash);
+      plusMinus = evidences.call(appendPlusMinus);
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
@@ -1644,7 +1620,7 @@ pnnBox = function() {
 
 module.exports = pnnBox;
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var sliderControl;
 
 sliderControl = function() {
@@ -1723,13 +1699,13 @@ sliderControl = function() {
 
 module.exports = sliderControl;
 
-},{}]},{},[4]);
+},{}]},{},[5]);
 
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var pnnBox;
 
 pnnBox = function() {
-  var chart, drag, evidences, headingButtons, height, label, setupInteract, title, titleClass, width;
+  var chart, evidences, headingButtons, height, label, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -1753,39 +1729,41 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
-  drag = true;
-  setupInteract = function() {
-    return interact('.draggable').draggable({
-      inertia: true,
-      restrict: {
-        restriction: 'parent',
-        endOnly: true,
-        elementRect: {
-          top: 0,
-          left: 0,
-          bottom: 1,
-          right: 1
-        }
-      },
-      onmove: function(event) {
-        var target, x, y;
-        target = event.target;
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-        target.style.webkitTransform = target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
-        target.setAttribute('data-x', x);
-        return target.setAttribute('data-y', y);
-      },
-      onend: function(event) {
-        var textEl;
-        textEl = event.target.querySelector('p');
-        return textEl && (textEl.textContent = 'moved a distance of ' + (Math.sqrt(event.dx * event.dx + event.dy * event.dy) | 0) + 'px');
-      }
-    }).allowFrom('.panel-heading');
-  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var body, div, heading;
+      var appendPlusMinus, appendTrash, body, div, heading, plusMinus, removeItems, trash;
+      removeItems = function(d, i) {
+        var plusMinus, trash;
+        data.splice(i, 1);
+        evidences.data(data).text(function(d) {
+          return d;
+        }).style({
+          margin: '5px 0'
+        });
+        evidences = body.selectAll('div.evidence').data(data);
+        trash = evidences.call(appendTrash);
+        plusMinus = evidences.call(appendPlusMinus);
+        return evidences.exit().remove();
+      };
+      appendPlusMinus = function(selection) {
+        return selection.each(function(data) {
+          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '1em'
+          });
+          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
+            'margin-top': '4px',
+            'margin-right': '2px'
+          });
+        });
+      };
+      appendTrash = function(selection) {
+        return selection.each(function(data) {
+          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
+            'margin-top': '4px'
+          }).on('click', removeItems);
+        });
+      };
       div = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -1794,27 +1772,18 @@ pnnBox = function() {
         'data-box-category': title
       });
       div.style({
-        'min-width': width + 'px'
+        'min-width': 100 + '%'
       });
       heading = div.append('div').attr('class', 'panel-heading');
       heading.text(title);
       body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div').data(data).enter().append('div').text(function(d) {
+      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
         return d;
       }).style({
         margin: '5px 0'
       });
-      evidences.append('i').attr('class', 'fa fa-trash pull-right').style({
-        'margin-top': '2px'
-      }).on('click', function(d, i) {
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        return evidences = body.selectAll('div').data(data).exit().remove();
-      });
+      trash = evidences.call(appendTrash);
+      plusMinus = evidences.call(appendPlusMinus);
       return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
         'margin': '2px 5px'
       }).text(label);
