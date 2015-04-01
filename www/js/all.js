@@ -581,7 +581,7 @@ module.exports = hypothesisBox;
 var pnnBox;
 
 pnnBox = function() {
-  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -594,65 +594,77 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
+  removeItems = function(d, i) {
+    var body, data;
+    body = d3.select(this.parentNode.parentNode);
+    data = body.data()[0];
+    data.splice(i, 1);
+    body.data([data]);
+    return body.call(chart.initEvidences);
+  };
+  appendPlusMinus = function(selection) {
+    selection.append('i').attr('class', 'fa fa-minus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '1em'
+    });
+    return selection.append('i').attr('class', 'fa fa-plus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '2px'
+    });
+  };
+  appendTrash = function(selection) {
+    return selection.append('i').attr('class', 'fa fa-trash pull-right').style({
+      'margin-top': '4px'
+    }).on('click', removeItems);
+  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
-      removeItems = function(d, i) {
-        var evidences, plusMinus, trash;
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        evidences = body.selectAll('div.evidence').data(data);
-        trash = evidences.call(appendTrash);
-        plusMinus = evidences.call(appendPlusMinus);
-        return evidences.exit().remove();
-      };
-      appendPlusMinus = function(selection) {
-        return selection.each(function(data) {
-          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '1em'
-          });
-          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '2px'
-          });
-        });
-      };
-      appendTrash = function(selection) {
-        return selection.each(function(data) {
-          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
-            'margin-top': '4px'
-          }).on('click', removeItems);
-        });
-      };
-      div = d3.select(this).attr({
+      var mainDiv;
+      mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
         'data-parent-box': parentBox || 0,
         'data-box-category': title
-      });
-      div.style({
+      }).style({
         'min-width': 100 + '%'
       });
-      heading = div.append('div').attr('class', 'panel-heading');
-      heading.text(title);
-      body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
-        return d;
-      }).style({
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
+    });
+  };
+  chart.initHeading = function(selection) {
+    var heading;
+    if (selection.select('.panel-heading').empty()) {
+      heading = selection.append('div').attr('class', 'panel-heading');
+    }
+    heading.text(title);
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+      'margin': '2px 5px'
+    }).text(label);
+  };
+  chart.initBody = function(selection) {
+    var body;
+    if (selection.select('.panel-body').empty()) {
+      body = selection.append('div').attr('class', 'panel-body');
+    }
+    return body.call(chart.initEvidences);
+  };
+  chart.initEvidences = function(selection) {
+    return selection.each(function(data) {
+      var evidence, plusMinus, trash;
+      evidence = d3.select(this).selectAll('div.evidence').data(data);
+      evidence.enter().append('div').attr('class', 'evidence').style({
         margin: '5px 0'
       });
-      trash = evidences.call(appendTrash);
-      plusMinus = evidences.call(appendPlusMinus);
-      return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
-        'margin': '2px 5px'
-      }).text(label);
+      evidence.text(function(d) {
+        return d;
+      });
+      evidence.exit().remove();
+      trash = evidence.call(appendTrash);
+      return plusMinus = evidence.call(appendPlusMinus);
     });
   };
   chart.width = function(value) {
@@ -1484,7 +1496,7 @@ content.style.height = contentHeight + 'px';
 var pnnBox;
 
 pnnBox = function() {
-  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -1497,65 +1509,77 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
+  removeItems = function(d, i) {
+    var body, data;
+    body = d3.select(this.parentNode.parentNode);
+    data = body.data()[0];
+    data.splice(i, 1);
+    body.data([data]);
+    return body.call(chart.initEvidences);
+  };
+  appendPlusMinus = function(selection) {
+    selection.append('i').attr('class', 'fa fa-minus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '1em'
+    });
+    return selection.append('i').attr('class', 'fa fa-plus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '2px'
+    });
+  };
+  appendTrash = function(selection) {
+    return selection.append('i').attr('class', 'fa fa-trash pull-right').style({
+      'margin-top': '4px'
+    }).on('click', removeItems);
+  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
-      removeItems = function(d, i) {
-        var evidences, plusMinus, trash;
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        evidences = body.selectAll('div.evidence').data(data);
-        trash = evidences.call(appendTrash);
-        plusMinus = evidences.call(appendPlusMinus);
-        return evidences.exit().remove();
-      };
-      appendPlusMinus = function(selection) {
-        return selection.each(function(data) {
-          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '1em'
-          });
-          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '2px'
-          });
-        });
-      };
-      appendTrash = function(selection) {
-        return selection.each(function(data) {
-          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
-            'margin-top': '4px'
-          }).on('click', removeItems);
-        });
-      };
-      div = d3.select(this).attr({
+      var mainDiv;
+      mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
         'data-parent-box': parentBox || 0,
         'data-box-category': title
-      });
-      div.style({
+      }).style({
         'min-width': 100 + '%'
       });
-      heading = div.append('div').attr('class', 'panel-heading');
-      heading.text(title);
-      body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
-        return d;
-      }).style({
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
+    });
+  };
+  chart.initHeading = function(selection) {
+    var heading;
+    if (selection.select('.panel-heading').empty()) {
+      heading = selection.append('div').attr('class', 'panel-heading');
+    }
+    heading.text(title);
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+      'margin': '2px 5px'
+    }).text(label);
+  };
+  chart.initBody = function(selection) {
+    var body;
+    if (selection.select('.panel-body').empty()) {
+      body = selection.append('div').attr('class', 'panel-body');
+    }
+    return body.call(chart.initEvidences);
+  };
+  chart.initEvidences = function(selection) {
+    return selection.each(function(data) {
+      var evidence, plusMinus, trash;
+      evidence = d3.select(this).selectAll('div.evidence').data(data);
+      evidence.enter().append('div').attr('class', 'evidence').style({
         margin: '5px 0'
       });
-      trash = evidences.call(appendTrash);
-      plusMinus = evidences.call(appendPlusMinus);
-      return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
-        'margin': '2px 5px'
-      }).text(label);
+      evidence.text(function(d) {
+        return d;
+      });
+      evidence.exit().remove();
+      trash = evidence.call(appendTrash);
+      return plusMinus = evidence.call(appendPlusMinus);
     });
   };
   chart.width = function(value) {
@@ -1690,7 +1714,7 @@ module.exports = sliderControl;
 var pnnBox;
 
 pnnBox = function() {
-  var chart, headingButtons, height, label, parentBox, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
@@ -1703,65 +1727,77 @@ pnnBox = function() {
     lineChart: null
   };
   label = 5;
+  removeItems = function(d, i) {
+    var body, data;
+    body = d3.select(this.parentNode.parentNode);
+    data = body.data()[0];
+    data.splice(i, 1);
+    body.data([data]);
+    return body.call(chart.initEvidences);
+  };
+  appendPlusMinus = function(selection) {
+    selection.append('i').attr('class', 'fa fa-minus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '1em'
+    });
+    return selection.append('i').attr('class', 'fa fa-plus pull-right').style({
+      'margin-top': '4px',
+      'margin-right': '2px'
+    });
+  };
+  appendTrash = function(selection) {
+    return selection.append('i').attr('class', 'fa fa-trash pull-right').style({
+      'margin-top': '4px'
+    }).on('click', removeItems);
+  };
   chart = function(selection) {
     return selection.each(function(data) {
-      var appendPlusMinus, appendTrash, body, div, evidences, heading, plusMinus, removeItems, trash;
-      removeItems = function(d, i) {
-        var evidences, plusMinus, trash;
-        data.splice(i, 1);
-        evidences.data(data).text(function(d) {
-          return d;
-        }).style({
-          margin: '5px 0'
-        });
-        evidences = body.selectAll('div.evidence').data(data);
-        trash = evidences.call(appendTrash);
-        plusMinus = evidences.call(appendPlusMinus);
-        return evidences.exit().remove();
-      };
-      appendPlusMinus = function(selection) {
-        return selection.each(function(data) {
-          d3.select(this).append('i').attr('class', 'fa fa-minus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '1em'
-          });
-          return d3.select(this).append('i').attr('class', 'fa fa-plus pull-right').style({
-            'margin-top': '4px',
-            'margin-right': '2px'
-          });
-        });
-      };
-      appendTrash = function(selection) {
-        return selection.each(function(data) {
-          return d3.select(this).append('i').attr('class', 'fa fa-trash pull-right').style({
-            'margin-top': '4px'
-          }).on('click', removeItems);
-        });
-      };
-      div = d3.select(this).attr({
+      var mainDiv;
+      mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
         },
         'data-box-type': 'pnn',
         'data-parent-box': parentBox || 0,
         'data-box-category': title
-      });
-      div.style({
+      }).style({
         'min-width': 100 + '%'
       });
-      heading = div.append('div').attr('class', 'panel-heading');
-      heading.text(title);
-      body = div.append('div').attr('class', 'panel-body');
-      evidences = body.selectAll('div.evidence').data(data).enter().append('div').attr('class', 'evidence').text(function(d) {
-        return d;
-      }).style({
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
+    });
+  };
+  chart.initHeading = function(selection) {
+    var heading;
+    if (selection.select('.panel-heading').empty()) {
+      heading = selection.append('div').attr('class', 'panel-heading');
+    }
+    heading.text(title);
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+      'margin': '2px 5px'
+    }).text(label);
+  };
+  chart.initBody = function(selection) {
+    var body;
+    if (selection.select('.panel-body').empty()) {
+      body = selection.append('div').attr('class', 'panel-body');
+    }
+    return body.call(chart.initEvidences);
+  };
+  chart.initEvidences = function(selection) {
+    return selection.each(function(data) {
+      var evidence, plusMinus, trash;
+      evidence = d3.select(this).selectAll('div.evidence').data(data);
+      evidence.enter().append('div').attr('class', 'evidence').style({
         margin: '5px 0'
       });
-      trash = evidences.call(appendTrash);
-      plusMinus = evidences.call(appendPlusMinus);
-      return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
-        'margin': '2px 5px'
-      }).text(label);
+      evidence.text(function(d) {
+        return d;
+      });
+      evidence.exit().remove();
+      trash = evidence.call(appendTrash);
+      return plusMinus = evidence.call(appendPlusMinus);
     });
   };
   chart.width = function(value) {
