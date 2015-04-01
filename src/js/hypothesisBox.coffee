@@ -35,6 +35,7 @@ hypothesisBox = ->
 					'data-box-number': number)
 				.style
 					width: width+'px'
+					position: 'absolute'
 
 			mainDiv.data [data]
 			mainDiv.call chart.initHeading
@@ -56,22 +57,22 @@ hypothesisBox = ->
 			.on 'click', (d)->
 
 				if not hideBody
-					d3.select(this).select('.panel-body')
+					selection.select('.panel-body')
 						.style hideDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
 
-					d3.select(this).select('.ach-bar')
+					selection.select('.ach-bar')
 						.style showDivStyle
 
 					hideBody = true
 				else
-					d3.select(this).select('.panel-body')
+					selection.select('.panel-body')
 						.style showDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
 
-					d3.select(this).select('.ach-bar')
+					selection.select('.ach-bar')
 						.style hideDivStyle
 
 					hideBody = false

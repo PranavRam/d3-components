@@ -316,7 +316,8 @@ evidenceBox = function() {
         'data-box-type': 'evidence',
         'data-box-number': number
       }).style({
-        width: width + 'px'
+        width: width + 'px',
+        position: 'absolute'
       });
       layers.mainDiv.data([data]);
       layers.mainDiv.call(chart.initHeading);
@@ -334,12 +335,11 @@ evidenceBox = function() {
       'margin-top': '4px'
     }).on('click', function(d) {
       if (!hideBody) {
-        body.style(hideDivStyle);
+        selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
         return hideBody = true;
       } else {
-        body.style(showDivStyle);
-        div.style('height', 'auto');
+        selection.select('.panel-body').style(showDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
         return hideBody = false;
       }
@@ -504,7 +504,8 @@ hypothesisBox = function() {
         'data-box-type': 'hypothesis',
         'data-box-number': number
       }).style({
-        width: width + 'px'
+        width: width + 'px',
+        position: 'absolute'
       });
       mainDiv.data([data]);
       mainDiv.call(chart.initHeading);
@@ -523,14 +524,14 @@ hypothesisBox = function() {
       'margin-top': '4px'
     }).on('click', function(d) {
       if (!hideBody) {
-        d3.select(this).select('.panel-body').style(hideDivStyle);
+        selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
-        d3.select(this).select('.ach-bar').style(showDivStyle);
+        selection.select('.ach-bar').style(showDivStyle);
         return hideBody = true;
       } else {
-        d3.select(this).select('.panel-body').style(showDivStyle);
+        selection.select('.panel-body').style(showDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
-        d3.select(this).select('.ach-bar').style(hideDivStyle);
+        selection.select('.ach-bar').style(hideDivStyle);
         return hideBody = false;
       }
     });
@@ -980,7 +981,8 @@ evidenceBox = function() {
         'data-box-type': 'evidence',
         'data-box-number': number
       }).style({
-        width: width + 'px'
+        width: width + 'px',
+        position: 'absolute'
       });
       layers.mainDiv.data([data]);
       layers.mainDiv.call(chart.initHeading);
@@ -998,12 +1000,11 @@ evidenceBox = function() {
       'margin-top': '4px'
     }).on('click', function(d) {
       if (!hideBody) {
-        body.style(hideDivStyle);
+        selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
         return hideBody = true;
       } else {
-        body.style(showDivStyle);
-        div.style('height', 'auto');
+        selection.select('.panel-body').style(showDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
         return hideBody = false;
       }
@@ -1129,7 +1130,8 @@ hypothesisBox = function() {
         'data-box-type': 'hypothesis',
         'data-box-number': number
       }).style({
-        width: width + 'px'
+        width: width + 'px',
+        position: 'absolute'
       });
       mainDiv.data([data]);
       mainDiv.call(chart.initHeading);
@@ -1148,14 +1150,14 @@ hypothesisBox = function() {
       'margin-top': '4px'
     }).on('click', function(d) {
       if (!hideBody) {
-        d3.select(this).select('.panel-body').style(hideDivStyle);
+        selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
-        d3.select(this).select('.ach-bar').style(showDivStyle);
+        selection.select('.ach-bar').style(showDivStyle);
         return hideBody = true;
       } else {
-        d3.select(this).select('.panel-body').style(showDivStyle);
+        selection.select('.panel-body').style(showDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
-        d3.select(this).select('.ach-bar').style(hideDivStyle);
+        selection.select('.ach-bar').style(hideDivStyle);
         return hideBody = false;
       }
     });

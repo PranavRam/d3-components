@@ -40,6 +40,7 @@ evidenceBox = ->
 					'data-box-number': number)
 				.style
 					width: width+'px'
+					position: 'absolute'
 
 			layers.mainDiv.data [data]
 			layers.mainDiv.call chart.initHeading
@@ -60,17 +61,14 @@ evidenceBox = ->
 			.on 'click', (d)->
 
 				if not hideBody
-					body
+					selection.select '.panel-body'
 						.style hideDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
 					hideBody = true
 				else
-					body
+					selection.select '.panel-body'
 						.style showDivStyle
-
-					div
-						.style 'height', 'auto'
 
 					d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
 					hideBody = false
@@ -108,7 +106,7 @@ evidenceBox = ->
 									.style 
 										'margin': '5px 0'
 			entities.exit().remove()
-			
+
 			entityLabel = entityDiv.select 'span.label'
 			if entityLabel.empty()
 				entityLabel = entityDiv
