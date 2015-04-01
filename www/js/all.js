@@ -581,12 +581,13 @@ module.exports = hypothesisBox;
 var pnnBox;
 
 pnnBox = function() {
-  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, mainDiv, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
   parentBox = -1;
+  mainDiv = null;
   headingButtons = {
     chevron: null,
     label: null,
@@ -595,12 +596,12 @@ pnnBox = function() {
   };
   label = 5;
   removeItems = function(d, i) {
-    var body, data;
-    body = d3.select(this.parentNode.parentNode);
-    data = body.data()[0];
+    var data;
+    console.log(mainDiv.data());
+    data = mainDiv.data()[0];
     data.splice(i, 1);
-    body.data([data]);
-    return body.call(chart.initEvidences);
+    label--;
+    return chart.update(data);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -619,7 +620,6 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      var mainDiv;
       mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -630,24 +630,29 @@ pnnBox = function() {
       }).style({
         'min-width': 100 + '%'
       });
-      mainDiv.data([data]);
-      mainDiv.call(chart.initHeading);
-      return mainDiv.call(chart.initBody);
+      return chart.update(data);
     });
+  };
+  chart.update = function(data) {
+    mainDiv.data([data]);
+    mainDiv.call(chart.initHeading);
+    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;
-    if (selection.select('.panel-heading').empty()) {
+    heading = selection.select('.panel-heading');
+    if (heading.empty()) {
       heading = selection.append('div').attr('class', 'panel-heading');
     }
     heading.text(title);
-    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').text(label).style({
       'margin': '2px 5px'
-    }).text(label);
+    });
   };
   chart.initBody = function(selection) {
     var body;
-    if (selection.select('.panel-body').empty()) {
+    body = selection.select('.panel-body');
+    if (body.empty()) {
       body = selection.append('div').attr('class', 'panel-body');
     }
     return body.call(chart.initEvidences);
@@ -1496,12 +1501,13 @@ content.style.height = contentHeight + 'px';
 var pnnBox;
 
 pnnBox = function() {
-  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, mainDiv, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
   parentBox = -1;
+  mainDiv = null;
   headingButtons = {
     chevron: null,
     label: null,
@@ -1510,12 +1516,12 @@ pnnBox = function() {
   };
   label = 5;
   removeItems = function(d, i) {
-    var body, data;
-    body = d3.select(this.parentNode.parentNode);
-    data = body.data()[0];
+    var data;
+    console.log(mainDiv.data());
+    data = mainDiv.data()[0];
     data.splice(i, 1);
-    body.data([data]);
-    return body.call(chart.initEvidences);
+    label--;
+    return chart.update(data);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -1534,7 +1540,6 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      var mainDiv;
       mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -1545,24 +1550,29 @@ pnnBox = function() {
       }).style({
         'min-width': 100 + '%'
       });
-      mainDiv.data([data]);
-      mainDiv.call(chart.initHeading);
-      return mainDiv.call(chart.initBody);
+      return chart.update(data);
     });
+  };
+  chart.update = function(data) {
+    mainDiv.data([data]);
+    mainDiv.call(chart.initHeading);
+    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;
-    if (selection.select('.panel-heading').empty()) {
+    heading = selection.select('.panel-heading');
+    if (heading.empty()) {
       heading = selection.append('div').attr('class', 'panel-heading');
     }
     heading.text(title);
-    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').text(label).style({
       'margin': '2px 5px'
-    }).text(label);
+    });
   };
   chart.initBody = function(selection) {
     var body;
-    if (selection.select('.panel-body').empty()) {
+    body = selection.select('.panel-body');
+    if (body.empty()) {
       body = selection.append('div').attr('class', 'panel-body');
     }
     return body.call(chart.initEvidences);
@@ -1714,12 +1724,13 @@ module.exports = sliderControl;
 var pnnBox;
 
 pnnBox = function() {
-  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, parentBox, removeItems, title, titleClass, width;
+  var appendPlusMinus, appendTrash, chart, headingButtons, height, label, mainDiv, parentBox, removeItems, title, titleClass, width;
   width = 200;
   height = 200;
   title = 'Positive';
   titleClass = 'panel-info';
   parentBox = -1;
+  mainDiv = null;
   headingButtons = {
     chevron: null,
     label: null,
@@ -1728,12 +1739,12 @@ pnnBox = function() {
   };
   label = 5;
   removeItems = function(d, i) {
-    var body, data;
-    body = d3.select(this.parentNode.parentNode);
-    data = body.data()[0];
+    var data;
+    console.log(mainDiv.data());
+    data = mainDiv.data()[0];
     data.splice(i, 1);
-    body.data([data]);
-    return body.call(chart.initEvidences);
+    label--;
+    return chart.update(data);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -1752,7 +1763,6 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      var mainDiv;
       mainDiv = d3.select(this).attr({
         'class': function(d) {
           return "pnn panel " + titleClass;
@@ -1763,24 +1773,29 @@ pnnBox = function() {
       }).style({
         'min-width': 100 + '%'
       });
-      mainDiv.data([data]);
-      mainDiv.call(chart.initHeading);
-      return mainDiv.call(chart.initBody);
+      return chart.update(data);
     });
+  };
+  chart.update = function(data) {
+    mainDiv.data([data]);
+    mainDiv.call(chart.initHeading);
+    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;
-    if (selection.select('.panel-heading').empty()) {
+    heading = selection.select('.panel-heading');
+    if (heading.empty()) {
       heading = selection.append('div').attr('class', 'panel-heading');
     }
     heading.text(title);
-    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').style({
+    return headingButtons.label = heading.append('span').attr('class', 'label label-default pull-right').text(label).style({
       'margin': '2px 5px'
-    }).text(label);
+    });
   };
   chart.initBody = function(selection) {
     var body;
-    if (selection.select('.panel-body').empty()) {
+    body = selection.select('.panel-body');
+    if (body.empty()) {
       body = selection.append('div').attr('class', 'panel-body');
     }
     return body.call(chart.initEvidences);

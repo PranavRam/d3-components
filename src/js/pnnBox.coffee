@@ -4,7 +4,7 @@ pnnBox = ->
 	title = 'Positive'
 	titleClass = 'panel-info'
 	parentBox = -1
-	# evidences = null
+	mainDiv = null
 	headingButtons = 
 		chevron: null
 		label: null
@@ -14,18 +14,12 @@ pnnBox = ->
 	label = 5
 
 	removeItems = (d,i)->
-		body = d3.select(this.parentNode.parentNode)
-		data = body.data()[0]
+		# body = d3.select(this.parentNode.parentNode)
+		console.log mainDiv.data()
+		data = mainDiv.data()[0]
 		data.splice(i, 1)
-		body.data [data]
-		# console.log arguments
-		# evidences.data data
-		# 	.text (d)-> d
-		# 	.style
-		# 		margin: '5px 0'
-		# console.log evidences
-		body.call chart.initEvidences
-		# console.log evidences	
+		label--
+		chart.update(data)
 
 	appendPlusMinus = (selection)->
 		# selection.each (data)->
@@ -70,27 +64,34 @@ pnnBox = ->
 				.style
 					'min-width': 100+'%'
 			# console.log data
-			mainDiv.data [data]
-			mainDiv.call chart.initHeading
-			mainDiv.call chart.initBody
+			chart.update(data)
 			# console.log div.attr('data-box-type', 'pnn')
 			# evidences.text (d,i)-> i
 
 			# if drag then setupInteract()
 
+	chart.update = (data)->
+		mainDiv.data [data]
+		mainDiv.call chart.initHeading
+		mainDiv.call chart.initBody
+
 	chart.initHeading = (selection)->
-		if selection.select('.panel-heading').empty()
+		heading = selection.select('.panel-heading')
+		if heading.empty()
 			heading = selection.append('div').attr 'class', 'panel-heading'
+
 		heading.text title
+
 		headingButtons.label = heading
 				.append 'span'
 				.attr 'class', 'label label-default pull-right'
+				.text label
 				.style
 					'margin': '2px 5px'
-				.text label
 
 	chart.initBody = (selection)->
-		if selection.select('.panel-body').empty()
+		body = selection.select('.panel-body')
+		if body.empty()
 			body = selection.append('div').attr 'class', 'panel-body'
 		# selection.each (data)-> console.log data
 		body.call chart.initEvidences
