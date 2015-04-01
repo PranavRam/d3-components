@@ -56,15 +56,23 @@ group = svg.append 'g'
 						transform: "translate(#{[offset, offset]})"
 					.call picker
 
+window.hypo =
+	positive:
+		data: ["Evidence 1", "Evidence 2"]
+	negative:
+		data: ["Evidence 3", "Evidence 4"]
+	neutral:
+		data: ["Evidence 5", "Evidence 6"]
+
 eBox = evidenceBox()
-hBox = hypothesisBox()
+window.hBox = hypothesisBox()
 
 box1 = d3.select '#evidence'
-					.data [0]
+					# .data [0]
 					.call eBox
 
 box2 = d3.select '#hypothesis'
-					.data [0]
+					.data [hypo]
 					.call hBox
 
 setupDropzoneForEvidences = ->

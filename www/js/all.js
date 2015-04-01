@@ -442,21 +442,24 @@ pnnBox = require('./pnnBox');
 ACHBar = require('./ACHBar');
 
 hypothesisBox = function() {
-  var chart, headingButtons, height, hideBody, hypothesis, label, number, title, width;
+  var chart, headingButtons, height, hideBody, hideDivStyle, hypothesis, label, layers, number, showDivStyle, title, width;
   width = 400;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
-  hypothesis = {
-    positive: {
-      data: ["Evidence 1", "Evidence 2"]
-    },
-    negative: {
-      data: ["Evidence 3", "Evidence 4"]
-    },
-    neutral: {
-      data: ["Evidence 5", "Evidence 6"]
-    }
+  layers = {
+    mainDiv: null,
+    body: null,
+    bottomBar: null
+  };
+  hypothesis = null;
+  hideDivStyle = {
+    display: 'none',
+    visibility: 'hidden'
+  };
+  showDivStyle = {
+    display: 'block',
+    visibility: 'visible'
   };
   headingButtons = {
     chevron: null,
@@ -468,66 +471,93 @@ hypothesisBox = function() {
   hideBody = false;
   chart = function(selection) {
     return selection.each(function(data) {
-      var achBottomBar, body, bottomBar, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr({
-        'class': 'panel panel-dark draggable',
-        'data-box-type': 'hypothesis',
-        'data-box-number': number
-      });
-      div.style({
-        width: width + 'px'
-      });
-      heading = div.append('div').attr('class', 'panel-heading');
-      heading.text(title);
-      achBottomBar = ACHBar();
-      bottomBar = div.append('div').datum([10, 4, 2]).attr('class', 'ach-bar').style({
-        display: 'none',
-        visibility: 'hidden'
-      }).call(achBottomBar);
-      body = div.append('div').attr('class', 'panel-body');
+      if (layers.mainDiv === null) {
+        layers.mainDiv = d3.select(this).attr({
+          'class': 'panel panel-dark draggable',
+          'data-box-type': 'hypothesis',
+          'data-box-number': number
+        }).style({
+          width: width + 'px'
+        });
+      }
+      layers.mainDiv.data([data]);
+      layers.mainDiv.call(chart.initHeading);
+      layers.mainDiv.call(chart.initBody);
+      return layers.mainDiv.call(chart.initBottomBar);
+    });
+  };
+  chart.initHeading = function(selection) {
+    var heading;
+    heading = selection.select('.panel-heading');
+    if (heading.empty()) {
+      heading = selection.append('div').attr('class', 'panel-heading');
+    }
+    heading.text(title);
+    headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
+      'margin-top': '4px'
+    }).on('click', function(d) {
+      if (!hideBody) {
+        layers.body.style(hideDivStyle);
+        d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+        layers.bottomBar.style(showDivStyle);
+        return hideBody = true;
+      } else {
+        layers.body.style(showDivStyle);
+        d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
+        layers.bottomBar.style(hideDivStyle);
+        return hideBody = false;
+      }
+    });
+    headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
+      'margin': '4px 5px'
+    });
+    headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
+      'margin': '4px 5px'
+    });
+    return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+      'margin': '4px 5px'
+    }).text(label);
+  };
+  chart.initBody = function(selection) {
+    layers.body = selection.select('.panel-body');
+    if (layers.body.empty()) {
+      layers.body = selection.append('div').attr('class', 'panel-body');
+    }
+    return layers.body.call(chart.initPNNBoxes);
+  };
+  chart.initPNNBoxes = function(selection) {
+    return selection.each(function(data) {
+      var negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv, sel;
+      hypothesis = data;
       positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number);
       negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number);
       neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number);
-      positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
-      negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
-      neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
-      headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '4px'
-      }).on('click', function(d) {
-        if (!hideBody) {
-          body.style({
-            display: 'none',
-            visibility: 'hidden'
-          });
-          d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
-          bottomBar.style({
-            display: 'block',
-            visibility: 'visible'
-          });
-          return hideBody = true;
-        } else {
-          body.style({
-            display: 'block',
-            visibility: 'visible'
-          });
-          d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
-          bottomBar.style({
-            display: 'none',
-            visibility: 'hidden'
-          });
-          return hideBody = false;
-        }
-      });
-      headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
-        'margin': '4px 5px'
-      });
-      headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
-        'margin': '4px 5px'
-      });
-      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin': '4px 5px'
-      }).text(label);
+      sel = d3.select(this);
+      positiveDiv = sel.select('.pnn.panel-info');
+      if (positiveDiv.empty()) {
+        positiveDiv = sel.append('div');
+      }
+      positiveDiv.data([hypothesis.positive.data]).call(positiveBox);
+      negativeDiv = sel.select('.pnn.panel-danger');
+      if (negativeDiv.empty()) {
+        negativeDiv = sel.append('div');
+      }
+      negativeDiv.data([hypothesis.negative.data]).call(negativeBox);
+      neutralDiv = sel.select('.pnn.panel-warning');
+      if (neutralDiv.empty()) {
+        neutralDiv = sel.append('div');
+      }
+      return neutralDiv.data([hypothesis.neutral.data]).call(neutralBox);
     });
+  };
+  chart.initBottomBar = function(selection) {
+    var achBottomBar;
+    achBottomBar = ACHBar();
+    layers.bottomBar = selection.select('.ach-bar');
+    if (layers.bottomBar.empty()) {
+      layers.bottomBar = selection.append('div');
+    }
+    return layers.bottomBar.datum([10, 4, 2]).attr('class', 'ach-bar').style(hideDivStyle).call(achBottomBar);
   };
   chart.width = function(value) {
     if (!arguments.length) {
@@ -550,12 +580,11 @@ hypothesisBox = function() {
     title = value;
     return chart;
   };
-  chart.evidences = function(value) {
-    var evidences;
+  chart.hypothesis = function(value) {
     if (!arguments.length) {
-      return evidences;
+      return hypothesis;
     }
-    evidences = value;
+    hypothesis = value;
     return chart;
   };
   chart.label = function(value) {
@@ -597,11 +626,10 @@ pnnBox = function() {
   label = 5;
   removeItems = function(d, i) {
     var data;
-    console.log(mainDiv.data());
     data = mainDiv.data()[0];
     data.splice(i, 1);
     label--;
-    return chart.update(data);
+    return mainDiv.call(chart);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -620,23 +648,22 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      mainDiv = d3.select(this).attr({
-        'class': function(d) {
-          return "pnn panel " + titleClass;
-        },
-        'data-box-type': 'pnn',
-        'data-parent-box': parentBox || 0,
-        'data-box-category': title
-      }).style({
-        'min-width': 100 + '%'
-      });
-      return chart.update(data);
+      if (mainDiv === null) {
+        mainDiv = d3.select(this).attr({
+          'class': function(d) {
+            return "pnn panel " + titleClass;
+          },
+          'data-box-type': 'pnn',
+          'data-parent-box': parentBox || 0,
+          'data-box-category': title
+        }).style({
+          'min-width': 100 + '%'
+        });
+      }
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
     });
-  };
-  chart.update = function(data) {
-    mainDiv.data([data]);
-    mainDiv.call(chart.initHeading);
-    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;
@@ -1014,21 +1041,24 @@ pnnBox = require('./pnnBox');
 ACHBar = require('./ACHBar');
 
 hypothesisBox = function() {
-  var chart, headingButtons, height, hideBody, hypothesis, label, number, title, width;
+  var chart, headingButtons, height, hideBody, hideDivStyle, hypothesis, label, layers, number, showDivStyle, title, width;
   width = 400;
   height = 400;
   number = 0;
   title = 'Anand Framed Roger Rabbit';
-  hypothesis = {
-    positive: {
-      data: ["Evidence 1", "Evidence 2"]
-    },
-    negative: {
-      data: ["Evidence 3", "Evidence 4"]
-    },
-    neutral: {
-      data: ["Evidence 5", "Evidence 6"]
-    }
+  layers = {
+    mainDiv: null,
+    body: null,
+    bottomBar: null
+  };
+  hypothesis = null;
+  hideDivStyle = {
+    display: 'none',
+    visibility: 'hidden'
+  };
+  showDivStyle = {
+    display: 'block',
+    visibility: 'visible'
   };
   headingButtons = {
     chevron: null,
@@ -1040,66 +1070,93 @@ hypothesisBox = function() {
   hideBody = false;
   chart = function(selection) {
     return selection.each(function(data) {
-      var achBottomBar, body, bottomBar, div, heading, negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv;
-      div = d3.select(this).attr({
-        'class': 'panel panel-dark draggable',
-        'data-box-type': 'hypothesis',
-        'data-box-number': number
-      });
-      div.style({
-        width: width + 'px'
-      });
-      heading = div.append('div').attr('class', 'panel-heading');
-      heading.text(title);
-      achBottomBar = ACHBar();
-      bottomBar = div.append('div').datum([10, 4, 2]).attr('class', 'ach-bar').style({
-        display: 'none',
-        visibility: 'hidden'
-      }).call(achBottomBar);
-      body = div.append('div').attr('class', 'panel-body');
+      if (layers.mainDiv === null) {
+        layers.mainDiv = d3.select(this).attr({
+          'class': 'panel panel-dark draggable',
+          'data-box-type': 'hypothesis',
+          'data-box-number': number
+        }).style({
+          width: width + 'px'
+        });
+      }
+      layers.mainDiv.data([data]);
+      layers.mainDiv.call(chart.initHeading);
+      layers.mainDiv.call(chart.initBody);
+      return layers.mainDiv.call(chart.initBottomBar);
+    });
+  };
+  chart.initHeading = function(selection) {
+    var heading;
+    heading = selection.select('.panel-heading');
+    if (heading.empty()) {
+      heading = selection.append('div').attr('class', 'panel-heading');
+    }
+    heading.text(title);
+    headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
+      'margin-top': '4px'
+    }).on('click', function(d) {
+      if (!hideBody) {
+        layers.body.style(hideDivStyle);
+        d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+        layers.bottomBar.style(showDivStyle);
+        return hideBody = true;
+      } else {
+        layers.body.style(showDivStyle);
+        d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
+        layers.bottomBar.style(hideDivStyle);
+        return hideBody = false;
+      }
+    });
+    headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
+      'margin': '4px 5px'
+    });
+    headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
+      'margin': '4px 5px'
+    });
+    return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
+      'margin': '4px 5px'
+    }).text(label);
+  };
+  chart.initBody = function(selection) {
+    layers.body = selection.select('.panel-body');
+    if (layers.body.empty()) {
+      layers.body = selection.append('div').attr('class', 'panel-body');
+    }
+    return layers.body.call(chart.initPNNBoxes);
+  };
+  chart.initPNNBoxes = function(selection) {
+    return selection.each(function(data) {
+      var negativeBox, negativeDiv, neutralBox, neutralDiv, positiveBox, positiveDiv, sel;
+      hypothesis = data;
       positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number);
       negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number);
       neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number);
-      positiveDiv = body.append('div').data([hypothesis.positive.data]).call(positiveBox);
-      negativeDiv = body.append('div').data([hypothesis.negative.data]).call(negativeBox);
-      neutralDiv = body.append('div').data([hypothesis.neutral.data]).call(neutralBox);
-      headingButtons.chevron = heading.append('i').attr('class', 'fa fa-chevron-up pull-right').style({
-        'margin-top': '4px'
-      }).on('click', function(d) {
-        if (!hideBody) {
-          body.style({
-            display: 'none',
-            visibility: 'hidden'
-          });
-          d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
-          bottomBar.style({
-            display: 'block',
-            visibility: 'visible'
-          });
-          return hideBody = true;
-        } else {
-          body.style({
-            display: 'block',
-            visibility: 'visible'
-          });
-          d3.select(this).attr('class', 'fa fa-chevron-up pull-right');
-          bottomBar.style({
-            display: 'none',
-            visibility: 'hidden'
-          });
-          return hideBody = false;
-        }
-      });
-      headingButtons.settings = heading.append('i').attr('class', 'fa fa-cog pull-right').style({
-        'margin': '4px 5px'
-      });
-      headingButtons.lineChart = heading.append('i').attr('class', 'fa fa-line-chart pull-right').style({
-        'margin': '4px 5px'
-      });
-      return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
-        'margin': '4px 5px'
-      }).text(label);
+      sel = d3.select(this);
+      positiveDiv = sel.select('.pnn.panel-info');
+      if (positiveDiv.empty()) {
+        positiveDiv = sel.append('div');
+      }
+      positiveDiv.data([hypothesis.positive.data]).call(positiveBox);
+      negativeDiv = sel.select('.pnn.panel-danger');
+      if (negativeDiv.empty()) {
+        negativeDiv = sel.append('div');
+      }
+      negativeDiv.data([hypothesis.negative.data]).call(negativeBox);
+      neutralDiv = sel.select('.pnn.panel-warning');
+      if (neutralDiv.empty()) {
+        neutralDiv = sel.append('div');
+      }
+      return neutralDiv.data([hypothesis.neutral.data]).call(neutralBox);
     });
+  };
+  chart.initBottomBar = function(selection) {
+    var achBottomBar;
+    achBottomBar = ACHBar();
+    layers.bottomBar = selection.select('.ach-bar');
+    if (layers.bottomBar.empty()) {
+      layers.bottomBar = selection.append('div');
+    }
+    return layers.bottomBar.datum([10, 4, 2]).attr('class', 'ach-bar').style(hideDivStyle).call(achBottomBar);
   };
   chart.width = function(value) {
     if (!arguments.length) {
@@ -1122,12 +1179,11 @@ hypothesisBox = function() {
     title = value;
     return chart;
   };
-  chart.evidences = function(value) {
-    var evidences;
+  chart.hypothesis = function(value) {
     if (!arguments.length) {
-      return evidences;
+      return hypothesis;
     }
-    evidences = value;
+    hypothesis = value;
     return chart;
   };
   chart.label = function(value) {
@@ -1217,7 +1273,7 @@ labColorPicker = function() {
 module.exports = labColorPicker;
 
 },{}],5:[function(require,module,exports){
-var box1, box2, container, content, eBox, evidenceBox, group, hBox, height, hypothesisBox, labColorPicker, margin, offset, picker, setupDragForEvidences, setupDragForHypotheses, setupDropzoneForEvidences, setupDropzoneForHypothesesPNN, sliderControl, svg, width;
+var box1, box2, container, content, eBox, evidenceBox, group, height, hypothesisBox, labColorPicker, margin, offset, picker, setupDragForEvidences, setupDragForHypotheses, setupDropzoneForEvidences, setupDropzoneForHypothesesPNN, sliderControl, svg, width;
 
 sliderControl = require('./sliderControl');
 
@@ -1282,13 +1338,25 @@ group = svg.append('g').attr({
   transform: "translate(" + [offset, offset] + ")"
 }).call(picker);
 
+window.hypo = {
+  positive: {
+    data: ["Evidence 1", "Evidence 2"]
+  },
+  negative: {
+    data: ["Evidence 3", "Evidence 4"]
+  },
+  neutral: {
+    data: ["Evidence 5", "Evidence 6"]
+  }
+};
+
 eBox = evidenceBox();
 
-hBox = hypothesisBox();
+window.hBox = hypothesisBox();
 
-box1 = d3.select('#evidence').data([0]).call(eBox);
+box1 = d3.select('#evidence').call(eBox);
 
-box2 = d3.select('#hypothesis').data([0]).call(hBox);
+box2 = d3.select('#hypothesis').data([hypo]).call(hBox);
 
 setupDropzoneForEvidences = function() {
   return interact("[data-box-type='evidence']").dropzone({
@@ -1517,11 +1585,10 @@ pnnBox = function() {
   label = 5;
   removeItems = function(d, i) {
     var data;
-    console.log(mainDiv.data());
     data = mainDiv.data()[0];
     data.splice(i, 1);
     label--;
-    return chart.update(data);
+    return mainDiv.call(chart);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -1540,23 +1607,22 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      mainDiv = d3.select(this).attr({
-        'class': function(d) {
-          return "pnn panel " + titleClass;
-        },
-        'data-box-type': 'pnn',
-        'data-parent-box': parentBox || 0,
-        'data-box-category': title
-      }).style({
-        'min-width': 100 + '%'
-      });
-      return chart.update(data);
+      if (mainDiv === null) {
+        mainDiv = d3.select(this).attr({
+          'class': function(d) {
+            return "pnn panel " + titleClass;
+          },
+          'data-box-type': 'pnn',
+          'data-parent-box': parentBox || 0,
+          'data-box-category': title
+        }).style({
+          'min-width': 100 + '%'
+        });
+      }
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
     });
-  };
-  chart.update = function(data) {
-    mainDiv.data([data]);
-    mainDiv.call(chart.initHeading);
-    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;
@@ -1740,11 +1806,10 @@ pnnBox = function() {
   label = 5;
   removeItems = function(d, i) {
     var data;
-    console.log(mainDiv.data());
     data = mainDiv.data()[0];
     data.splice(i, 1);
     label--;
-    return chart.update(data);
+    return mainDiv.call(chart);
   };
   appendPlusMinus = function(selection) {
     selection.append('i').attr('class', 'fa fa-minus pull-right').style({
@@ -1763,23 +1828,22 @@ pnnBox = function() {
   };
   chart = function(selection) {
     return selection.each(function(data) {
-      mainDiv = d3.select(this).attr({
-        'class': function(d) {
-          return "pnn panel " + titleClass;
-        },
-        'data-box-type': 'pnn',
-        'data-parent-box': parentBox || 0,
-        'data-box-category': title
-      }).style({
-        'min-width': 100 + '%'
-      });
-      return chart.update(data);
+      if (mainDiv === null) {
+        mainDiv = d3.select(this).attr({
+          'class': function(d) {
+            return "pnn panel " + titleClass;
+          },
+          'data-box-type': 'pnn',
+          'data-parent-box': parentBox || 0,
+          'data-box-category': title
+        }).style({
+          'min-width': 100 + '%'
+        });
+      }
+      mainDiv.data([data]);
+      mainDiv.call(chart.initHeading);
+      return mainDiv.call(chart.initBody);
     });
-  };
-  chart.update = function(data) {
-    mainDiv.data([data]);
-    mainDiv.call(chart.initHeading);
-    return mainDiv.call(chart.initBody);
   };
   chart.initHeading = function(selection) {
     var heading;

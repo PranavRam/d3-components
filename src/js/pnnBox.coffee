@@ -15,11 +15,12 @@ pnnBox = ->
 
 	removeItems = (d,i)->
 		# body = d3.select(this.parentNode.parentNode)
-		console.log mainDiv.data()
+		# console.log mainDiv.data()
 		data = mainDiv.data()[0]
 		data.splice(i, 1)
 		label--
-		chart.update(data)
+		# chart.update(data)
+		mainDiv.call chart
 
 	appendPlusMinus = (selection)->
 		# selection.each (data)->
@@ -55,25 +56,23 @@ pnnBox = ->
 		# console.log arguments
 		selection.each (data)->
 			# console.log data
-			mainDiv = d3.select(this)
-				.attr(
-					'class': (d)-> "pnn panel #{titleClass}"
-					'data-box-type': 'pnn'
-					'data-parent-box': parentBox || 0
-					'data-box-category': title)
-				.style
-					'min-width': 100+'%'
+			if mainDiv is null
+				mainDiv = d3.select(this)
+					.attr(
+						'class': (d)-> "pnn panel #{titleClass}"
+						'data-box-type': 'pnn'
+						'data-parent-box': parentBox || 0
+						'data-box-category': title)
+					.style
+						'min-width': 100+'%'
 			# console.log data
-			chart.update(data)
+			mainDiv.data [data]
+			mainDiv.call chart.initHeading
+			mainDiv.call chart.initBody
 			# console.log div.attr('data-box-type', 'pnn')
 			# evidences.text (d,i)-> i
 
 			# if drag then setupInteract()
-
-	chart.update = (data)->
-		mainDiv.data [data]
-		mainDiv.call chart.initHeading
-		mainDiv.call chart.initBody
 
 	chart.initHeading = (selection)->
 		heading = selection.select('.panel-heading')

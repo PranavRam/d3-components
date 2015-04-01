@@ -6,14 +6,19 @@ hypothesisBox = ->
 	height = 400
 	number = 0
 	title = 'Anand Framed Roger Rabbit'
+	layers = 
+		mainDiv: null
+		body: null
+		bottomBar: null
 
-	hypothesis =
-		positive:
-			data: ["Evidence 1", "Evidence 2"]
-		negative:
-			data: ["Evidence 3", "Evidence 4"]
-		neutral:
-			data: ["Evidence 5", "Evidence 6"]
+	hypothesis = null
+
+	hideDivStyle = 
+		display: 'none'
+		visibility: 'hidden'
+	showDivStyle =
+		display: 'block'
+		visibility: 'visible'
 
 	headingButtons = 
 		chevron: null
@@ -27,125 +32,126 @@ hypothesisBox = ->
 	chart = (selection)->
 		# console.log selection[0][0]
 		selection.each (data)->
-			div = d3.select(this)
-				.attr(
-					'class': 'panel panel-dark draggable'
-					'data-box-type': 'hypothesis'
-					'data-box-number': number)
+			if layers.mainDiv is null
+				layers.mainDiv = d3.select(this)
+					.attr(
+						'class': 'panel panel-dark draggable'
+						'data-box-type': 'hypothesis'
+						'data-box-number': number)
+					.style
+						width: width+'px'
 
-			div
-				.style
-					width: width+'px'
-					# height: height+'px'
+			layers.mainDiv.data [data]
+			layers.mainDiv.call chart.initHeading
+			layers.mainDiv.call chart.initBody
+			layers.mainDiv.call chart.initBottomBar
+			
+	chart.initHeading = (selection)->
+		heading = selection.select('.panel-heading')
+		if heading.empty()
+			heading = selection.append('div').attr 'class', 'panel-heading'
 
-			heading = div.append('div').attr 'class', 'panel-heading'
-			heading.text title
+		heading.text title
 
-			achBottomBar = ACHBar()
-			bottomBar = div
-						.append('div')
-						.datum [10, 4, 2]
-						.attr('class', 'ach-bar')
-						.style
-								display: 'none'
-								visibility: 'hidden'
-						.call achBottomBar
+		headingButtons.chevron = heading
+			.append 'i'
+			.attr 'class', 'fa fa-chevron-up pull-right'
+			.style
+				'margin-top': '4px'
+			.on 'click', (d)->
 
-			body = div.append('div').attr 'class', 'panel-body'
+				if not hideBody
+					layers.body
+						.style hideDivStyle
 
+					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
+
+					layers.bottomBar
+						.style showDivStyle
+
+					hideBody = true
+				else
+					layers.body
+						.style showDivStyle
+
+					d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
+
+					layers.bottomBar
+						.style hideDivStyle
+
+					hideBody = false
+
+		headingButtons.settings = heading
+			.append 'i'
+			.attr 'class', 'fa fa-cog pull-right'
+			.style
+				'margin': '4px 5px'
+
+		headingButtons.lineChart = heading
+			.append 'i'
+			.attr 'class', 'fa fa-line-chart pull-right'
+			.style
+				'margin': '4px 5px'
+
+		headingButtons.label = heading
+			.append 'span'
+			.attr 'class', 'label label-danger pull-right'
+			.style
+				'margin': '4px 5px'
+			.text label
+
+
+	chart.initBody = (selection)->
+		layers.body = selection.select('.panel-body')
+		if layers.body.empty()
+			layers.body = selection.append('div').attr 'class', 'panel-body'
+
+		layers.body.call chart.initPNNBoxes
+
+	chart.initPNNBoxes = (selection)->
+		selection.each (data)->
+			hypothesis = data
+			
 			positiveBox = pnnBox().title('Positive').titleClass('panel-info').parentBox(number)
 			negativeBox = pnnBox().title('Negative').titleClass('panel-danger').parentBox(number)
 			neutralBox = pnnBox().title('Neutral').titleClass('panel-warning').parentBox(number)
 			# negativeBox = hypothesisBox().title('Negative')
 			# neutralBox = hypothesisBox().title('Neutral')
+			sel = d3.select(this)
+			positiveDiv = sel.select '.pnn.panel-info'
+			if positiveDiv.empty()
+				positiveDiv = sel.append('div')
+			positiveDiv
+				.data([hypothesis.positive.data])
+				.call positiveBox
 
-			# console.log [hypothesis.positive.data]
-			positiveDiv = body
-									.append('div')
-									.data([hypothesis.positive.data])
-									.call positiveBox
+			negativeDiv = sel.select '.pnn.panel-danger'
+			if negativeDiv.empty()
+				negativeDiv = sel.append('div')
+			negativeDiv
+				.data([hypothesis.negative.data])
+				.call negativeBox
 
-			negativeDiv = body
-									.append('div')
-									.data([hypothesis.negative.data])
-									.call negativeBox
+			neutralDiv = sel.select '.pnn.panel-warning'
+			if neutralDiv.empty()
+				neutralDiv = sel.append('div')
+			neutralDiv
+				.data([hypothesis.neutral.data])
+				.call neutralBox
 
-			neutralDiv = body
-									.append('div')
-									.data([hypothesis.neutral.data])
-									.call neutralBox
-			# margin = 5
-			# domain = [0, 100]
-			# cScale = d3.scale.linear()
-			# 					.domain domain
-			# 					.range ['#edd400', '#a40000']
-			# rectangle = body.append('svg').append 'rect'
-			# 			.attr
-			# 				x: margin
-			# 				y: margin*2
-			# 				width: 100
-			# 				height: 100
-			# 				fill: cScale(70)
+	chart.initBottomBar = (selection)->
+		achBottomBar = ACHBar()
+		layers.bottomBar = selection.select '.ach-bar'
 
-			headingButtons.chevron = heading
-				.append 'i'
-				.attr 'class', 'fa fa-chevron-up pull-right'
-				.style
-					'margin-top': '4px'
-				.on 'click', (d)->
+		if layers.bottomBar.empty()
+			layers.bottomBar = selection.append('div')
 
-					if not hideBody
-						body
-							.style
-								display: 'none'
-								visibility: 'hidden'
-						# div
-						# 	.style 'height', 'auto'
-
-						d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
-
-						bottomBar
-							.style
-								display: 'block'
-								visibility: 'visible'
-
-						hideBody = true
-					else
-						body
-							.style
-								display: 'block'
-								visibility: 'visible'
-
-						# div
-						# 	.style 'height', 'auto'
-
-						d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
-
-						bottomBar
-							.style
-								display: 'none'
-								visibility: 'hidden'
-
-						hideBody = false
-
-			headingButtons.settings = heading
-				.append 'i'
-				.attr 'class', 'fa fa-cog pull-right'
-				.style
-					'margin': '4px 5px'
-
-			headingButtons.lineChart = heading
-				.append 'i'
-				.attr 'class', 'fa fa-line-chart pull-right'
-				.style
-					'margin': '4px 5px'
-
-			headingButtons.label = heading
-				.append 'span'
-				.attr 'class', 'label label-danger pull-right'
-				.style
-					'margin': '4px 5px'
-				.text label
+		layers.bottomBar
+			.datum [10, 4, 2]
+			.attr('class', 'ach-bar')
+			.style hideDivStyle
+			.call achBottomBar
+					
 
 	chart.width = (value)->
 		if !arguments.length then return width
@@ -162,9 +168,9 @@ hypothesisBox = ->
 		title = value
 		chart
 
-	chart.evidences = (value)->
-		if !arguments.length then return evidences
-		evidences = value
+	chart.hypothesis = (value)->
+		if !arguments.length then return hypothesis
+		hypothesis = value
 		chart
 
 	chart.label = (value)->
