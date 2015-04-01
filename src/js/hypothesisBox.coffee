@@ -6,11 +6,6 @@ hypothesisBox = ->
 	height = 400
 	number = 0
 	title = 'Anand Framed Roger Rabbit'
-	layers = 
-		mainDiv: null
-		body: null
-		bottomBar: null
-
 	hypothesis = null
 
 	hideDivStyle = 
@@ -30,21 +25,21 @@ hypothesisBox = ->
 	hideBody = false
 
 	chart = (selection)->
-		# console.log selection[0][0]
 		selection.each (data)->
-			if layers.mainDiv is null
-				layers.mainDiv = d3.select(this)
-					.attr(
-						'class': 'panel panel-dark draggable'
-						'data-box-type': 'hypothesis'
-						'data-box-number': number)
-					.style
-						width: width+'px'
+			console.log this
+			# if layers.mainDiv is null
+			mainDiv = d3.select(this)
+				.attr(
+					'class': 'panel panel-dark draggable hypothesis'
+					'data-box-type': 'hypothesis'
+					'data-box-number': number)
+				.style
+					width: width+'px'
 
-			layers.mainDiv.data [data]
-			layers.mainDiv.call chart.initHeading
-			layers.mainDiv.call chart.initBody
-			layers.mainDiv.call chart.initBottomBar
+			mainDiv.data [data]
+			mainDiv.call chart.initHeading
+			mainDiv.call chart.initBody
+			mainDiv.call chart.initBottomBar
 			
 	chart.initHeading = (selection)->
 		heading = selection.select('.panel-heading')
@@ -61,22 +56,22 @@ hypothesisBox = ->
 			.on 'click', (d)->
 
 				if not hideBody
-					layers.body
+					d3.select(this).select('.panel-body')
 						.style hideDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
 
-					layers.bottomBar
+					d3.select(this).select('.ach-bar')
 						.style showDivStyle
 
 					hideBody = true
 				else
-					layers.body
+					d3.select(this).select('.panel-body')
 						.style showDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
 
-					layers.bottomBar
+					d3.select(this).select('.ach-bar')
 						.style hideDivStyle
 
 					hideBody = false
@@ -102,11 +97,11 @@ hypothesisBox = ->
 
 
 	chart.initBody = (selection)->
-		layers.body = selection.select('.panel-body')
-		if layers.body.empty()
-			layers.body = selection.append('div').attr 'class', 'panel-body'
+		body = selection.select('.panel-body')
+		if body.empty()
+			body = selection.append('div').attr 'class', 'panel-body'
 
-		layers.body.call chart.initPNNBoxes
+		body.call chart.initPNNBoxes
 
 	chart.initPNNBoxes = (selection)->
 		selection.each (data)->
@@ -141,12 +136,12 @@ hypothesisBox = ->
 
 	chart.initBottomBar = (selection)->
 		achBottomBar = ACHBar()
-		layers.bottomBar = selection.select '.ach-bar'
+		bottomBar = selection.select '.ach-bar'
 
-		if layers.bottomBar.empty()
-			layers.bottomBar = selection.append('div')
+		if bottomBar.empty()
+			bottomBar = selection.append('div')
 
-		layers.bottomBar
+		bottomBar
 			.datum [10, 4, 2]
 			.attr('class', 'ach-bar')
 			.style hideDivStyle

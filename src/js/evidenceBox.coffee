@@ -3,6 +3,16 @@ evidenceBox = ->
 	height = 300
 	number = 0
 	title = 'Evidence 1 (110203.txt)'
+	layers =
+		mainDiv: null
+
+	hideDivStyle = 
+		display: 'none'
+		visibility: 'hidden'
+	showDivStyle =
+		display: 'block'
+		visibility: 'visible'
+
 	evidences = [{
 		name:'Anand',
 		type: 'label-success'
@@ -23,76 +33,90 @@ evidenceBox = ->
 
 	chart = (selection)->
 		selection.each (data)->
-			div = d3.select(this)
+			layers.mainDiv = d3.select(this)
 				.attr(
 					'class': 'panel panel-primary draggable'
 					'data-box-type': 'evidence'
 					'data-box-number': number)
-
-			div
 				.style
 					width: width+'px'
-					# height: height+'px'
 
-			heading = div.append('div').attr 'class', 'panel-heading'
+			layers.mainDiv.data [data]
+			layers.mainDiv.call chart.initHeading
+			layers.mainDiv.call chart.initBody
 
-			heading.text title
+	chart.initHeading = (selection)->
+		heading = selection.select('.panel-heading')
+		if heading.empty()
+			heading = selection.append('div').attr 'class', 'panel-heading'
 
-			body = div.append('div').attr 'class', 'panel-body dropzone'
+		heading.text title
 
-			evidenceDivs = body.selectAll('span').data(evidences)
-			evidenceDivs.enter()
-					.append('div')
-					.style 'margin', '5px 0'
-					.append('span')
-					.attr 'class', (d, i)-> "label #{d.type}"
-					.text (d)-> d.name
-					.style
-						margin: '5px'
+		headingButtons.chevron = heading
+			.append 'i'
+			.attr 'class', 'fa fa-chevron-up pull-right'
+			.style
+				'margin-top': '4px'
+			.on 'click', (d)->
 
+				if not hideBody
+					body
+						.style hideDivStyle
 
-			headingButtons.chevron = heading
-				.append 'i'
-				.attr 'class', 'fa fa-chevron-up pull-right'
-				.style
-					'margin-top': '4px'
-				.on 'click', (d)->
+					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
+					hideBody = true
+				else
+					body
+						.style showDivStyle
 
-					if not hideBody
-						body
-							.style
-								display: 'none'
-								visibility: 'hidden'
-						# div
-						# 	.style 'height', '43px'
+					div
+						.style 'height', 'auto'
 
-						d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
-						hideBody = true
-					else
-						body
-							.style
-								display: 'block'
-								visibility: 'visible'
+					d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
+					hideBody = false
 
-						div
-							.style 'height', 'auto'
+		headingButtons.add = heading
+													.append 'i'
+													.attr 'class', 'fa fa-plus pull-right'
+													.style
+														'margin-top': '4px'
 
-						d3.select(this).attr 'class', 'fa fa-chevron-up pull-right'
-						hideBody = false
+		headingButtons.label = heading
+			.append 'span'
+			.attr 'class', 'label label-danger pull-right'
+			.style
+				'margin-top': '4px'
+			.text label
 
-			headingButtons.add = heading
-														.append 'i'
-														.attr 'class', 'fa fa-plus pull-right'
-														.style
-															'margin-top': '4px'
+	chart.initBody = (selection)->
+		body = selection.select('.panel-body')
+		if body.empty()
+			body = selection.append('div').attr 'class', 'panel-body dropzone'
+		# selection.each (data)-> console.log data
+		body.call chart.initEntities
 
-			headingButtons.label = heading
-				.append 'span'
-				.attr 'class', 'label label-danger pull-right'
-				.style
-					'margin-top': '4px'
-				.text label
-			# console.log body
+	chart.initEntities = (selection)->
+		selection.each (data)->
+			sel = d3.select this
+			entities = sel.selectAll('div.entity')
+									.data evidences
+
+			entityDiv = entities
+									.enter()
+									.append 'div'
+									.attr 'class', 'entity'
+									.style 
+										'margin': '5px 0'
+			entities.exit().remove()
+			
+			entityLabel = entityDiv.select 'span.label'
+			if entityLabel.empty()
+				entityLabel = entityDiv
+												.append 'span'
+			entityLabel
+				.attr 'class', (d, i)-> "label #{d.type}"
+				.text (d)-> d.name
+
 
 	chart.width = (value)->
 		if !arguments.length then return width

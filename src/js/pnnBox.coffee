@@ -4,7 +4,7 @@ pnnBox = ->
 	title = 'Positive'
 	titleClass = 'panel-info'
 	parentBox = -1
-	mainDiv = null
+	# mainDiv = null
 	headingButtons = 
 		chevron: null
 		label: null
@@ -15,7 +15,7 @@ pnnBox = ->
 
 	removeItems = (d,i)->
 		# body = d3.select(this.parentNode.parentNode)
-		# console.log mainDiv.data()
+		mainDiv = d3.select(this.parentNode.parentNode.parentNode)
 		data = mainDiv.data()[0]
 		data.splice(i, 1)
 		label--
@@ -44,7 +44,6 @@ pnnBox = ->
 		# data selection.data()
 		# selection.each (data)->
 			# console.log data
-			# console.log 'here'
 		selection
 			.append('i')
 			.attr 'class', 'fa fa-trash pull-right'
@@ -55,16 +54,14 @@ pnnBox = ->
 	chart = (selection)->
 		# console.log arguments
 		selection.each (data)->
-			# console.log data
-			if mainDiv is null
-				mainDiv = d3.select(this)
-					.attr(
-						'class': (d)-> "pnn panel #{titleClass}"
-						'data-box-type': 'pnn'
-						'data-parent-box': parentBox || 0
-						'data-box-category': title)
-					.style
-						'min-width': 100+'%'
+			mainDiv = d3.select(this)
+				.attr(
+					'class': (d)-> "pnn panel #{titleClass}"
+					'data-box-type': 'pnn'
+					'data-parent-box': parentBox || 0
+					'data-box-category': title)
+				.style
+					'min-width': 100+'%'
 			# console.log data
 			mainDiv.data [data]
 			mainDiv.call chart.initHeading

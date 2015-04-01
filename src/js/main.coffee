@@ -63,7 +63,13 @@ window.hypo =
 		data: ["Evidence 3", "Evidence 4"]
 	neutral:
 		data: ["Evidence 5", "Evidence 6"]
-
+window.hypo2 =
+	positive:
+		data: ["Evidence 11", "Evidence 21"]
+	negative:
+		data: ["Evidence 31", "Evidence 41"]
+	neutral:
+		data: ["Evidence 51", "Evidence 61"]
 eBox = evidenceBox()
 window.hBox = hypothesisBox()
 
@@ -71,14 +77,14 @@ box1 = d3.select '#evidence'
 					# .data [0]
 					.call eBox
 
-box2 = d3.select '#hypothesis'
-					.data [hypo]
+box2 = d3.selectAll '.hypothesis'
+					.data [hypo,hypo2]
 					.call hBox
 
 setupDropzoneForEvidences = ->
 	interact("[data-box-type='evidence']").dropzone
 	  accept: '[data-type="entity"]'
-	  overlap: 0.1
+	  overlap: 'pointer'
 	  ondropactivate: (event) ->
 	    # add active dropzone feedback
 	    event.target.classList.add 'drop-active'
@@ -120,7 +126,7 @@ setupDropzoneForEvidences = ->
 setupDropzoneForHypothesesPNN =  ->
 	interact("[data-box-type='hypothesis'] [data-box-type='pnn']").dropzone
 	  accept: '[data-box-type="evidence"]'
-	  overlap: 0.3
+	  overlap: 'pointer'
 	  ondropactivate: (event) ->
 	    # add active dropzone feedback
 	    event.target.classList.add 'drop-active'

@@ -14,12 +14,12 @@ var scrollLeftField = document.getElementById("scrollLeft");
 var scrollTopField = document.getElementById("scrollTop");
 var zoomLevelField = document.getElementById("zoomLevel");
 
-setInterval(function() {
-	var values = scroller.getValues();
-	scrollLeftField.value = values.left.toFixed(2);
-	scrollTopField.value = values.top.toFixed(2);
-	zoomLevelField.value = values.zoom.toFixed(2);
-}, 500);
+// setInterval(function() {
+// 	var values = scroller.getValues();
+// 	scrollLeftField.value = values.left.toFixed(2);
+// 	scrollTopField.value = values.top.toFixed(2);
+// 	zoomLevelField.value = values.zoom.toFixed(2);
+// }, 500);
 
 
 var rect = container.getBoundingClientRect();
@@ -36,7 +36,7 @@ var reflow = function() {
 window.addEventListener("resize", reflow, false);
 reflow();
 
-var checkboxes = document.querySelectorAll("#settings input[type=checkbox]");
+/*var checkboxes = document.querySelectorAll("#settings input[type=checkbox]");
 for (var i=0, l=checkboxes.length; i<l; i++) {
 	checkboxes[i].addEventListener("change", function() {
 		scroller.options[this.id] = this.checked;
@@ -73,7 +73,7 @@ document.querySelector("#settings #scrollByDown").addEventListener("click", func
 
 document.querySelector("#settings #scrollByLeft").addEventListener("click", function() {
 	scroller.scrollBy(-150, 0, true);
-}, false);
+}, false);*/
 
 
 if ('ontouchstart' in window) {
