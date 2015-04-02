@@ -26,7 +26,7 @@ hypothesisBox = ->
 
 	chart = (selection)->
 		selection.each (data)->
-			console.log this
+			# console.log this
 			# if layers.mainDiv is null
 			mainDiv = d3.select(this)
 				.attr(

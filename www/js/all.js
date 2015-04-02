@@ -274,7 +274,7 @@ module.exports = bubbleChart;
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, evidences, headingButtons, height, hideBody, hideDivStyle, label, layers, number, showDivStyle, title, width;
+  var addPopoutHypothesisList, chart, evidences, headingButtons, height, hideBody, hideDivStyle, label, layers, number, showDivStyle, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -321,7 +321,36 @@ evidenceBox = function() {
       });
       layers.mainDiv.data([data]);
       layers.mainDiv.call(chart.initHeading);
-      return layers.mainDiv.call(chart.initBody);
+      layers.mainDiv.call(chart.initBody);
+      return layers.mainDiv.call(addPopoutHypothesisList);
+    });
+  };
+  addPopoutHypothesisList = function(selection, hideList) {
+    return selection.each(function(data) {
+      var hypotheses, popUp, sel, showHideObj, visibility;
+      sel = d3.select(this);
+      popUp = sel.select('div.popUp');
+      if (popUp.empty()) {
+        popUp = sel.append('div').attr('class', 'popUp').style(showDivStyle);
+      }
+      visibility = popUp.style('visibility');
+      showHideObj = visibility === 'visible' ? hideDivStyle : showDivStyle;
+      showHideObj = hideList ? hideDivStyle : showHideObj;
+      popUp.style({
+        position: 'absolute',
+        width: '150px',
+        height: '200px',
+        left: (width + 10) + "px",
+        'background-color': 'white',
+        border: '1px solid black',
+        'overflow-y': 'scroll',
+        'border-radius': '4px',
+        top: 0
+      });
+      hypotheses = popUp.selectAll('div.hypotheses-item').data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).enter().append('div').attr('class', 'hypotheses-item').text(function(d) {
+        return "Hypothesis " + d;
+      });
+      return popUp.style(showHideObj);
     });
   };
   chart.initHeading = function(selection) {
@@ -337,6 +366,7 @@ evidenceBox = function() {
       if (!hideBody) {
         selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+        addPopoutHypothesisList(d3.select(this.parentNode.parentNode), true);
         return hideBody = true;
       } else {
         selection.select('.panel-body').style(showDivStyle);
@@ -346,6 +376,8 @@ evidenceBox = function() {
     });
     headingButtons.add = heading.append('i').attr('class', 'fa fa-plus pull-right').style({
       'margin-top': '4px'
+    }).on('click', function(d) {
+      return addPopoutHypothesisList(d3.select(this.parentNode.parentNode));
     });
     return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
       'margin-top': '4px'
@@ -498,7 +530,6 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var mainDiv;
-      console.log(this);
       mainDiv = d3.select(this).attr({
         'class': 'panel panel-dark draggable hypothesis',
         'data-box-type': 'hypothesis',
@@ -939,7 +970,7 @@ module.exports = ACHBar;
 var evidenceBox;
 
 evidenceBox = function() {
-  var chart, evidences, headingButtons, height, hideBody, hideDivStyle, label, layers, number, showDivStyle, title, width;
+  var addPopoutHypothesisList, chart, evidences, headingButtons, height, hideBody, hideDivStyle, label, layers, number, showDivStyle, title, width;
   width = 250;
   height = 300;
   number = 0;
@@ -986,7 +1017,36 @@ evidenceBox = function() {
       });
       layers.mainDiv.data([data]);
       layers.mainDiv.call(chart.initHeading);
-      return layers.mainDiv.call(chart.initBody);
+      layers.mainDiv.call(chart.initBody);
+      return layers.mainDiv.call(addPopoutHypothesisList);
+    });
+  };
+  addPopoutHypothesisList = function(selection, hideList) {
+    return selection.each(function(data) {
+      var hypotheses, popUp, sel, showHideObj, visibility;
+      sel = d3.select(this);
+      popUp = sel.select('div.popUp');
+      if (popUp.empty()) {
+        popUp = sel.append('div').attr('class', 'popUp').style(showDivStyle);
+      }
+      visibility = popUp.style('visibility');
+      showHideObj = visibility === 'visible' ? hideDivStyle : showDivStyle;
+      showHideObj = hideList ? hideDivStyle : showHideObj;
+      popUp.style({
+        position: 'absolute',
+        width: '150px',
+        height: '200px',
+        left: (width + 10) + "px",
+        'background-color': 'white',
+        border: '1px solid black',
+        'overflow-y': 'scroll',
+        'border-radius': '4px',
+        top: 0
+      });
+      hypotheses = popUp.selectAll('div.hypotheses-item').data([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).enter().append('div').attr('class', 'hypotheses-item').text(function(d) {
+        return "Hypothesis " + d;
+      });
+      return popUp.style(showHideObj);
     });
   };
   chart.initHeading = function(selection) {
@@ -1002,6 +1062,7 @@ evidenceBox = function() {
       if (!hideBody) {
         selection.select('.panel-body').style(hideDivStyle);
         d3.select(this).attr('class', 'fa fa-chevron-down pull-right');
+        addPopoutHypothesisList(d3.select(this.parentNode.parentNode), true);
         return hideBody = true;
       } else {
         selection.select('.panel-body').style(showDivStyle);
@@ -1011,6 +1072,8 @@ evidenceBox = function() {
     });
     headingButtons.add = heading.append('i').attr('class', 'fa fa-plus pull-right').style({
       'margin-top': '4px'
+    }).on('click', function(d) {
+      return addPopoutHypothesisList(d3.select(this.parentNode.parentNode));
     });
     return headingButtons.label = heading.append('span').attr('class', 'label label-danger pull-right').style({
       'margin-top': '4px'
@@ -1124,7 +1187,6 @@ hypothesisBox = function() {
   chart = function(selection) {
     return selection.each(function(data) {
       var mainDiv;
-      console.log(this);
       mainDiv = d3.select(this).attr({
         'class': 'panel panel-dark draggable hypothesis',
         'data-box-type': 'hypothesis',

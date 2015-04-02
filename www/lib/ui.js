@@ -143,6 +143,7 @@ if ('ontouchstart' in window) {
 	}, false);
 
 	container.addEventListener(navigator.userAgent.indexOf("Firefox") > -1 ? "DOMMouseScroll" :  "mousewheel", function(e) {
+		if(e.target.className === 'hypotheses-item' || e.target.className === 'popUp') return;
 		scroller.doMouseZoom(e.detail ? (e.detail * -120) : e.wheelDelta, e.timeStamp, e.pageX, e.pageY);
 	}, false);
 

@@ -45,6 +45,45 @@ evidenceBox = ->
 			layers.mainDiv.data [data]
 			layers.mainDiv.call chart.initHeading
 			layers.mainDiv.call chart.initBody
+			layers.mainDiv.call addPopoutHypothesisList
+
+	addPopoutHypothesisList = (selection, hideList)->
+		selection.each (data)->
+			sel = d3.select this
+			popUp = sel.select 'div.popUp'
+			if popUp.empty()
+				popUp = sel
+								.append 'div'
+								.attr 'class', 'popUp'
+								.style showDivStyle
+
+			visibility = popUp.style('visibility')
+
+			showHideObj = if visibility is 'visible' then hideDivStyle else showDivStyle
+			showHideObj = if hideList then hideDivStyle else showHideObj
+			popUp
+				.style
+					position: 'absolute'
+					width: '150px'
+					height: '200px'
+					left: "#{width + 10}px"
+					'background-color': 'white'
+					border: '1px solid black'
+					'overflow-y': 'scroll'
+					'border-radius': '4px'
+					top: 0
+
+			hypotheses = popUp
+										.selectAll 'div.hypotheses-item'
+										.data([0,1,2,3,4,5,6,7,8,9,10])
+										.enter()
+										.append 'div'
+										.attr 'class', 'hypotheses-item'
+										.text (d)-> "Hypothesis #{d}"
+
+
+			popUp
+				.style showHideObj
 
 	chart.initHeading = (selection)->
 		heading = selection.select('.panel-heading')
@@ -65,6 +104,7 @@ evidenceBox = ->
 						.style hideDivStyle
 
 					d3.select(this).attr 'class', 'fa fa-chevron-down pull-right'
+					addPopoutHypothesisList(d3.select(this.parentNode.parentNode), true)
 					hideBody = true
 				else
 					selection.select '.panel-body'
@@ -78,6 +118,8 @@ evidenceBox = ->
 													.attr 'class', 'fa fa-plus pull-right'
 													.style
 														'margin-top': '4px'
+													.on 'click', (d)->
+														addPopoutHypothesisList(d3.select(this.parentNode.parentNode))
 
 		headingButtons.label = heading
 			.append 'span'
